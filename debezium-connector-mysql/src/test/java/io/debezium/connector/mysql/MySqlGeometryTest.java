@@ -27,7 +27,7 @@ public class MySqlGeometryTest {
         MySqlGeometry geom = MySqlGeometry.fromBytes(mysqlBytes);
         assertTrue(geom.isPoint());
         assertEquals(geom.getSrid(), null);
-        double[] coords = Point.parseWKBPoint(geom.getWkb());
+        double[] coords = Point.parseWimport com.kingbase8(geom.getWkb());
         assertEquals(coords[0], 6.9845, 0.0001);
         assertEquals(coords[1], 18.22115554, 0.0001);
     }

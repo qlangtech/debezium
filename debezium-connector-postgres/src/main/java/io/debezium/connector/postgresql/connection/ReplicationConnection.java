@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Optional;
 
-import org.postgresql.replication.PGReplicationStream;
+import com.kingbase8.replication.PGReplicationStream;
 
 import io.debezium.annotation.NotThreadSafe;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;

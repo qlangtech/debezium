@@ -41,12 +41,12 @@ import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.errors.ConnectException;
-import org.postgresql.PGStatement;
-import org.postgresql.geometric.PGpoint;
-import org.postgresql.jdbc.PgArray;
-import org.postgresql.util.HStoreConverter;
-import org.postgresql.util.PGInterval;
-import org.postgresql.util.PGobject;
+import com.kingbase8.PGStatement;
+import com.kingbase8.geometric.PGpoint;
+import com.kingbase8.jdbc.PgArray;
+import com.kingbase8.util.HStoreConverter;
+import com.kingbase8.util.PGInterval;
+import com.kingbase8.util.PGobject;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;

@@ -19,12 +19,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.kafka.connect.errors.ConnectException;
-import org.postgresql.core.BaseConnection;
-import org.postgresql.jdbc.PgConnection;
-import org.postgresql.jdbc.TimestampUtils;
-import org.postgresql.replication.LogSequenceNumber;
-import org.postgresql.util.PGmoney;
-import org.postgresql.util.PSQLState;
+import com.kingbase8.core.BaseConnection;
+import com.kingbase8.jdbc.PgConnection;
+import com.kingbase8.jdbc.TimestampUtils;
+import com.kingbase8.replication.LogSequenceNumber;
+import com.kingbase8.util.PGmoney;
+import com.kingbase8.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

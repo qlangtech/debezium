@@ -7,7 +7,7 @@ package io.debezium.connector.postgresql;
 
 import java.util.Set;
 
-import org.postgresql.util.PSQLException;
+import com.kingbase8.util.PSQLException;
 
 import io.debezium.DebeziumException;
 import io.debezium.annotation.Immutable;

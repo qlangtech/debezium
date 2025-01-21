@@ -28,11 +28,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.connect.errors.ConnectException;
-import org.postgresql.core.BaseConnection;
-import org.postgresql.core.ServerVersion;
-import org.postgresql.replication.PGReplicationStream;
-import org.postgresql.replication.fluent.logical.ChainedLogicalStreamBuilder;
-import org.postgresql.util.PSQLException;
+import com.kingbase8.core.BaseConnection;
+import com.kingbase8.core.ServerVersion;
+import com.kingbase8.replication.PGReplicationStream;
+import com.kingbase8.replication.fluent.logical.ChainedLogicalStreamBuilder;
+import com.kingbase8.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

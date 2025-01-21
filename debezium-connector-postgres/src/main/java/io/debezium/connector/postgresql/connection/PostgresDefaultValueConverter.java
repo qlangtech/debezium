@@ -22,8 +22,8 @@ import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
-import org.postgresql.jdbc.TimestampUtils;
-import org.postgresql.util.PGInterval;
+import com.kingbase8.jdbc.TimestampUtils;
+import com.kingbase8.util.PGInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

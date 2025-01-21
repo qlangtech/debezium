@@ -55,7 +55,7 @@ public class Point extends Geometry {
      * @param y coordinate
      * @return OGC WKB byte array
      */
-    private static byte[] buildWKBPoint(double x, double y) {
+    private static byte[] buildWimport com.kingbase8(double x, double y) {
         ByteBuffer wkb = ByteBuffer.allocate(WKB_POINT_SIZE);
         wkb.put((byte) 1); // BOM
         wkb.order(ByteOrder.LITTLE_ENDIAN);
@@ -72,7 +72,7 @@ public class Point extends Geometry {
      * @param wkb OGC WKB geometry
      * @return x,y coordinate array
      */
-    public static double[] parseWKBPoint(byte[] wkb) throws IllegalArgumentException {
+    public static double[] parseWimport com.kingbase8(byte[] wkb) throws IllegalArgumentException {
         if (wkb.length != WKB_POINT_SIZE) {
             throw new IllegalArgumentException(String.format("Invalid WKB for Point (length %d < %d)", wkb.length, WKB_POINT_SIZE));
         }
@@ -103,7 +103,7 @@ public class Point extends Geometry {
      */
     public static Struct createValue(Schema geomSchema, double x, double y) {
         // turn the specified points
-        byte[] wkb = buildWKBPoint(x, y);
+        byte[] wkb = buildWimport com.kingbase8(x, y);
         Struct result = Geometry.createValue(geomSchema, wkb, null);
         result.put(X_FIELD, x);
         result.put(Y_FIELD, y);
@@ -119,7 +119,7 @@ public class Point extends Geometry {
      */
     public static Struct createValue(Schema geomSchema, byte[] wkb, Integer srid) throws IllegalArgumentException {
         Struct result = Geometry.createValue(geomSchema, wkb, srid);
-        double[] pt = parseWKBPoint(wkb);
+        double[] pt = parseWimport com.kingbase8(wkb);
         result.put(X_FIELD, pt[0]);
         result.put(Y_FIELD, pt[1]);
         return result;

@@ -6,7 +6,7 @@
 
 package io.debezium.connector.postgresql;
 
-import org.postgresql.core.Oid;
+import com.kingbase8.core.Oid;
 
 /**
  * Extension to the {@link org.postgresql.core.Oid} class which contains Postgres specific datatypes not found currently in the

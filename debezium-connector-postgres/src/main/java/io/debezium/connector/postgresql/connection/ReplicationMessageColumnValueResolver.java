@@ -5,7 +5,7 @@
  */
 package io.debezium.connector.postgresql.connection;
 
-import org.postgresql.util.PGmoney;
+import com.kingbase8.util.PGmoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

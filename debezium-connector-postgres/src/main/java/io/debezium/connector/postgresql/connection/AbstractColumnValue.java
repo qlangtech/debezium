@@ -13,16 +13,16 @@ import java.time.OffsetTime;
 import java.time.ZoneOffset;
 
 import org.apache.kafka.connect.errors.ConnectException;
-import org.postgresql.geometric.PGbox;
-import org.postgresql.geometric.PGcircle;
-import org.postgresql.geometric.PGline;
-import org.postgresql.geometric.PGlseg;
-import org.postgresql.geometric.PGpath;
-import org.postgresql.geometric.PGpoint;
-import org.postgresql.geometric.PGpolygon;
-import org.postgresql.jdbc.PgArray;
-import org.postgresql.util.PGInterval;
-import org.postgresql.util.PGmoney;
+import com.kingbase8.geometric.KBbox;
+import com.kingbase8.geometric.PGcircle;
+import com.kingbase8.geometric.PGline;
+import com.kingbase8.geometric.PGlseg;
+import com.kingbase8.geometric.PGpath;
+import com.kingbase8.geometric.PGpoint;
+import com.kingbase8.geometric.PGpolygon;
+import com.kingbase8.jdbc.PgArray;
+import com.kingbase8.util.PGInterval;
+import com.kingbase8.util.PGmoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,9 +82,9 @@ public abstract class AbstractColumnValue<T> implements ReplicationMessage.Colum
     }
 
     @Override
-    public PGbox asBox() {
+    public KBbox asBox() {
         try {
-            return new PGbox(asString());
+            return new KBbox(asString());
         }
         catch (final SQLException e) {
             LOGGER.error("Failed to parse point {}, {}", asString(), e);

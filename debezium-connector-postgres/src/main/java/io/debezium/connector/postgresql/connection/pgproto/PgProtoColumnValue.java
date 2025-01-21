@@ -17,9 +17,9 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
-import org.postgresql.geometric.PGpoint;
-import org.postgresql.jdbc.PgArray;
-import org.postgresql.util.PGmoney;
+import com.kingbase8.geometric.PGpoint;
+import com.kingbase8.jdbc.PgArray;
+import com.kingbase8.util.PGmoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

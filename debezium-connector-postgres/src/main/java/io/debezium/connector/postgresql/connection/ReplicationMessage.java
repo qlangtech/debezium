@@ -13,13 +13,13 @@ import java.time.OffsetTime;
 import java.util.List;
 import java.util.OptionalLong;
 
-import org.postgresql.geometric.PGbox;
-import org.postgresql.geometric.PGcircle;
-import org.postgresql.geometric.PGline;
-import org.postgresql.geometric.PGpath;
-import org.postgresql.geometric.PGpoint;
-import org.postgresql.geometric.PGpolygon;
-import org.postgresql.util.PGmoney;
+import com.kingbase8.geometric.KBbox;
+import com.kingbase8.geometric.PGcircle;
+import com.kingbase8.geometric.PGline;
+import com.kingbase8.geometric.PGpath;
+import com.kingbase8.geometric.PGpoint;
+import com.kingbase8.geometric.PGpolygon;
+import com.kingbase8.util.PGmoney;
 
 import io.debezium.connector.postgresql.PostgresStreamingChangeEventSource;
 import io.debezium.connector.postgresql.PostgresStreamingChangeEventSource.PgConnectionSupplier;
@@ -113,7 +113,7 @@ public interface ReplicationMessage {
 
         byte[] asByteArray();
 
-        PGbox asBox();
+        KBbox asBox();
 
         PGcircle asCircle();
 
