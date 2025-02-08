@@ -24,13 +24,13 @@ public class ReplicationMessageColumnValueResolver {
     /**
      * Resolve the value of a {@link ColumnValue}.
      *
-     * @param columnName the column name
-     * @param type the postgres type
-     * @param fullType the full type-name for the column
-     * @param value the column value
-     * @param connection a postgres connection supplier
+     * @param columnName              the column name
+     * @param type                    the postgres type
+     * @param fullType                the full type-name for the column
+     * @param value                   the column value
+     * @param connection              a postgres connection supplier
      * @param includeUnknownDatatypes true to include unknown data types, false otherwise
-     * @param typeRegistry the postgres type registry
+     * @param typeRegistry            the postgres type registry
      * @return
      */
     public static Object resolveValue(String columnName, PostgresType type, String fullType, ColumnValue value, final PgConnectionSupplier connection,
@@ -71,10 +71,10 @@ public class ReplicationMessageColumnValueResolver {
             case "serial":
             case "serial2":
             case "serial4":
-                // 百岁 baisui add for kingbase MySQL style 2025/02/08
-            case "tinyint":
                 return value.asInteger();
-
+            // 百岁 baisui add for kingbase MySQL style 2025/02/08
+            case "tinyint":
+                return new Short(value.asInteger().shortValue());
             case "bigint":
             case "bigserial":
             case "int8":
