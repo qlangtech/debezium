@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import io.debezium.connector.postgresql.PostgresStreamingChangeEventSource.PgConnectionSupplier;
 import io.debezium.connector.postgresql.PostgresType;
-import io.debezium.connector.postgresql.PostgresValueConverter;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.connector.postgresql.connection.wal2json.DateTimeFormat;
 
@@ -62,10 +62,10 @@ public abstract class AbstractColumnValue<T> implements ReplicationMessage.Colum
     @Override
     public OffsetDateTime asOffsetDateTimeAtUtc() {
         if ("infinity".equals(asString())) {
-            return PostgresValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME;
+            return KingBaseValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME;
         }
         else if ("-infinity".equals(asString())) {
-            return PostgresValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME;
+            return KingBaseValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME;
         }
         return DateTimeFormat.get().timestampWithTimeZoneToOffsetDateTime(asString()).withOffsetSameInstant(ZoneOffset.UTC);
     }
@@ -73,10 +73,10 @@ public abstract class AbstractColumnValue<T> implements ReplicationMessage.Colum
     @Override
     public Instant asInstant() {
         if ("infinity".equals(asString())) {
-            return PostgresValueConverter.POSITIVE_INFINITY_INSTANT;
+            return KingBaseValueConverter.POSITIVE_INFINITY_INSTANT;
         }
         else if ("-infinity".equals(asString())) {
-            return PostgresValueConverter.NEGATIVE_INFINITY_INSTANT;
+            return KingBaseValueConverter.NEGATIVE_INFINITY_INSTANT;
         }
         return DateTimeFormat.get().timestampToInstant(asString());
     }

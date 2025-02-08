@@ -75,7 +75,7 @@ public class PostgresConnectorTask extends BaseSourceTask<PostgresPartition, Pos
             databaseCharset = tempConnection.getDatabaseCharset();
         }
 
-        final PostgresValueConverterBuilder valueConverterBuilder = (typeRegistry) -> PostgresValueConverter.of(
+        final PostgresValueConverterBuilder valueConverterBuilder = (typeRegistry) -> KingBaseValueConverter.of(
                 connectorConfig,
                 databaseCharset,
                 typeRegistry);

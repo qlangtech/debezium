@@ -411,12 +411,12 @@ public final class TestHelper {
                 });
     }
 
-    private static PostgresValueConverter getPostgresValueConverter(TypeRegistry typeRegistry, PostgresConnectorConfig config) {
+    private static KingBaseValueConverter getPostgresValueConverter(TypeRegistry typeRegistry, PostgresConnectorConfig config) {
         return getPostgresValueConverterBuilder(config).build(typeRegistry);
     }
 
     private static PostgresValueConverterBuilder getPostgresValueConverterBuilder(PostgresConnectorConfig config) {
-        return typeRegistry -> new PostgresValueConverter(
+        return typeRegistry -> new KingBaseValueConverter(
                 Charset.forName("UTF-8"),
                 config.getDecimalMode(),
                 config.getTemporalPrecisionMode(),

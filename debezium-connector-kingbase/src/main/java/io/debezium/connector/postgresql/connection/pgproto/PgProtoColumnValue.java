@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import io.debezium.connector.postgresql.PgOid;
 import io.debezium.connector.postgresql.PostgresStreamingChangeEventSource.PgConnectionSupplier;
 import io.debezium.connector.postgresql.PostgresType;
-import io.debezium.connector.postgresql.PostgresValueConverter;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.connector.postgresql.connection.AbstractColumnValue;
 import io.debezium.connector.postgresql.connection.wal2json.DateTimeFormat;
@@ -148,7 +148,7 @@ public class PgProtoColumnValue extends AbstractColumnValue<PgProto.DatumMessage
 
         final String s = asString();
         if (s != null) {
-            return PostgresValueConverter.toSpecialValue(s).orElseGet(() -> new SpecialValueDecimal(new BigDecimal(s)));
+            return KingBaseValueConverter.toSpecialValue(s).orElseGet(() -> new SpecialValueDecimal(new BigDecimal(s)));
         }
         return null;
     }
@@ -196,11 +196,11 @@ public class PgProtoColumnValue extends AbstractColumnValue<PgProto.DatumMessage
         if (value.hasDatumInt64()) {
             if (value.getDatumInt64() >= TIMESTAMP_MAX) {
                 LOGGER.trace("Infinite(+) value '{}' arrived from database", value.getDatumInt64());
-                return PostgresValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME;
+                return KingBaseValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME;
             }
             else if (value.getDatumInt64() < TIMESTAMP_MIN) {
                 LOGGER.trace("Infinite(-) value '{}' arrived from database", value.getDatumInt64());
-                return PostgresValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME;
+                return KingBaseValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME;
             }
             return Conversions.toInstantFromMicros(value.getDatumInt64()).atOffset(ZoneOffset.UTC);
         }
@@ -214,11 +214,11 @@ public class PgProtoColumnValue extends AbstractColumnValue<PgProto.DatumMessage
         if (value.hasDatumInt64()) {
             if (value.getDatumInt64() >= TIMESTAMP_MAX) {
                 LOGGER.trace("Infinite(+) value '{}' arrived from database", value.getDatumInt64());
-                return PostgresValueConverter.POSITIVE_INFINITY_INSTANT;
+                return KingBaseValueConverter.POSITIVE_INFINITY_INSTANT;
             }
             else if (value.getDatumInt64() < TIMESTAMP_MIN) {
                 LOGGER.trace("Infinite(-) value '{}' arrived from database", value.getDatumInt64());
-                return PostgresValueConverter.NEGATIVE_INFINITY_INSTANT;
+                return KingBaseValueConverter.NEGATIVE_INFINITY_INSTANT;
             }
             return Conversions.toInstantFromMicros(value.getDatumInt64());
         }

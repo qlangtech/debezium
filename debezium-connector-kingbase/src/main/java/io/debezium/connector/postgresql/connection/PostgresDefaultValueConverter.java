@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.debezium.annotation.ThreadSafe;
-import io.debezium.connector.postgresql.PostgresValueConverter;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.relational.Column;
 import io.debezium.relational.DefaultValueConverter;
 import io.debezium.relational.ValueConverter;
@@ -50,10 +50,10 @@ public class PostgresDefaultValueConverter implements DefaultValueConverter {
             "float4", "float8", "int2", "int4", "serial", "int8", "bigserial", "smallserial", "uuid", "date", "time",
             "timestamp", "timestamptz", "interval");
 
-    private final PostgresValueConverter valueConverters;
+    private final KingBaseValueConverter valueConverters;
     private final Map<String, DefaultValueMapper> defaultValueMappers;
 
-    public PostgresDefaultValueConverter(PostgresValueConverter valueConverters, TimestampUtils timestampUtils) {
+    public PostgresDefaultValueConverter(KingBaseValueConverter valueConverters, TimestampUtils timestampUtils) {
         this.valueConverters = valueConverters;
         this.defaultValueMappers = Collections.unmodifiableMap(createDefaultValueMappers(timestampUtils));
     }

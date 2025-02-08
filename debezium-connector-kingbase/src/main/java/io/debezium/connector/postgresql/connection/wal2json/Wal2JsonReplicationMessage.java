@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import io.debezium.connector.postgresql.PostgresStreamingChangeEventSource.PgConnectionSupplier;
 import io.debezium.connector.postgresql.PostgresType;
-import io.debezium.connector.postgresql.PostgresValueConverter;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.connector.postgresql.connection.AbstractReplicationMessageColumn;
 import io.debezium.connector.postgresql.connection.ReplicationMessage;
@@ -158,7 +157,7 @@ class Wal2JsonReplicationMessage implements ReplicationMessage {
     /**
      * Converts the value (string representation) coming from wal2json plugin to
      * a Java value based on the type of the column from the message. This value will be converted later on if necessary by the
-     * {@link PostgresValueConverter#converter(Column, Field)} instance to match whatever the Connect schema type expects.
+     * {@link io.debezium.connector.postgresql.KingBaseValueConverter#converter(Column, Field)} instance to match whatever the Connect schema type expects.
      *
      * Note that the logic here is tightly coupled (i.e. dependent) on the wal2json plugin logic which writes the actual
      * JSON messages.

@@ -6,6 +6,8 @@
 
 package io.debezium.connector.postgresql;
 
+import static io.debezium.util.NumberConversions.BYTE_FALSE;
+import static io.debezium.util.NumberConversions.SHORT_FALSE;
 import static java.time.ZoneId.systemDefault;
 
 import java.io.StringWriter;
@@ -87,7 +89,7 @@ import io.debezium.util.Strings;
  *
  * @author Horia Chiorean (hchiorea@redhat.com)
  */
-public class PostgresValueConverter extends JdbcValueConverters {
+public class KingBaseValueConverter extends JdbcValueConverters {
 
     public static final Date POSITIVE_INFINITY_DATE = new Date(KBStatement.DATE_POSITIVE_INFINITY);
     public static final Timestamp POSITIVE_INFINITY_TIMESTAMP = new Timestamp(KBStatement.DATE_POSITIVE_INFINITY);
@@ -160,8 +162,8 @@ public class PostgresValueConverter extends JdbcValueConverters {
 
     private final int moneyFractionDigits;
 
-    public static PostgresValueConverter of(PostgresConnectorConfig connectorConfig, Charset databaseCharset, TypeRegistry typeRegistry) {
-        return new PostgresValueConverter(
+    public static KingBaseValueConverter of(PostgresConnectorConfig connectorConfig, Charset databaseCharset, TypeRegistry typeRegistry) {
+        return new KingBaseValueConverter(
                 databaseCharset,
                 connectorConfig.getDecimalMode(),
                 connectorConfig.getTemporalPrecisionMode(),
@@ -176,7 +178,7 @@ public class PostgresValueConverter extends JdbcValueConverters {
                 connectorConfig.moneyFractionDigits());
     }
 
-    protected PostgresValueConverter(Charset databaseCharset, DecimalMode decimalMode,
+    protected KingBaseValueConverter(Charset databaseCharset, DecimalMode decimalMode,
                                      TemporalPrecisionMode temporalPrecisionMode, ZoneOffset defaultOffset,
                                      BigIntUnsignedMode bigIntUnsignedMode, boolean includeUnknownDatatypes, TypeRegistry typeRegistry,
                                      HStoreHandlingMode hStoreMode, BinaryHandlingMode binaryMode, IntervalHandlingMode intervalMode,
@@ -191,6 +193,34 @@ public class PostgresValueConverter extends JdbcValueConverters {
         this.toastPlaceholderBinary = toastPlaceholder;
         this.toastPlaceholderString = new String(toastPlaceholder);
         this.moneyFractionDigits = moneyFractionDigits;
+    }
+
+    /**
+     * baisui add for tinyint converter, 2025/02/08
+     *
+     * @param column the column definition describing the {@code data} value; never null
+     * @param fieldDefn the field definition; never null
+     * @param data the data object to be converted into a {@link Date Kafka Connect date} type; never null
+     * @return
+     */
+    @Override
+    protected Object convertTinyInt(Column column, Field fieldDefn, Object data) {
+       // return super.convertTinyInt(column, fieldDefn, data);
+        return convertValue(column, fieldDefn, data, BYTE_FALSE, (r) -> {
+            if (data instanceof Byte) {
+                r.deliver(data);
+            }
+            else if (data instanceof Number) {
+                Number value = (Number) data;
+                r.deliver(Byte.valueOf(value.byteValue()));
+            }
+            else if (data instanceof Boolean) {
+                r.deliver(NumberConversions.getByte((Boolean) data));
+            }
+            else if (data instanceof String) {
+                r.deliver(Byte.valueOf((String) data));
+            }
+        });
     }
 
     @Override

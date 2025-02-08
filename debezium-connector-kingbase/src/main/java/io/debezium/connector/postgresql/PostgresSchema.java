@@ -56,7 +56,7 @@ public class PostgresSchema extends RelationalDatabaseSchema {
      * @param config the connector configuration, which is presumed to be valid
      */
     protected PostgresSchema(PostgresConnectorConfig config, TypeRegistry typeRegistry, PostgresDefaultValueConverter defaultValueConverter,
-                             TopicSelector<TableId> topicSelector, PostgresValueConverter valueConverter) {
+                             TopicSelector<TableId> topicSelector, KingBaseValueConverter valueConverter) {
         super(config, topicSelector, config.getTableFilters().dataCollectionFilter(),
                 config.getColumnFilter(), getTableSchemaBuilder(config, valueConverter, defaultValueConverter),
                 false, config.getKeyMapper());
@@ -67,7 +67,7 @@ public class PostgresSchema extends RelationalDatabaseSchema {
         this.readToastableColumns = config.skipRefreshSchemaOnMissingToastableData();
     }
 
-    private static TableSchemaBuilder getTableSchemaBuilder(PostgresConnectorConfig config, PostgresValueConverter valueConverter,
+    private static TableSchemaBuilder getTableSchemaBuilder(PostgresConnectorConfig config, KingBaseValueConverter valueConverter,
                                                             PostgresDefaultValueConverter defaultValueConverter) {
         return new TableSchemaBuilder(valueConverter, defaultValueConverter, config.schemaNameAdjustmentMode().createAdjuster(),
                 config.customConverterRegistry(), config.getSourceInfoStructMaker().schema(),

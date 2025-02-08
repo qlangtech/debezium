@@ -35,7 +35,7 @@ import io.debezium.connector.postgresql.PgOid;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;
 import io.debezium.connector.postgresql.PostgresSchema;
 import io.debezium.connector.postgresql.PostgresType;
-import io.debezium.connector.postgresql.PostgresValueConverter;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.connector.postgresql.spi.SlotState;
 import io.debezium.data.SpecialValueDecimal;
@@ -85,11 +85,11 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Creates a Postgres connection using the supplied configuration.
      * If necessary this connection is able to resolve data type mappings.
-     * Such a connection requires a {@link PostgresValueConverter}, and will provide its own {@link TypeRegistry}.
+     * Such a connection requires a {@link io.debezium.connector.postgresql.KingBaseValueConverter}, and will provide its own {@link TypeRegistry}.
      * Usually only one such connection per connector is needed.
      *
      * @param config {@link Configuration} instance, may not be null.
-     * @param valueConverterBuilder supplies a configured {@link PostgresValueConverter} for a given {@link TypeRegistry}
+     * @param valueConverterBuilder supplies a configured {@link io.debezium.connector.postgresql.KingBaseValueConverter} for a given {@link TypeRegistry}
      * @param connectionUsage a symbolic name of the connection to be tracked in monitoring tools
      */
     public PostgresConnection(JdbcConfiguration config, PostgresValueConverterBuilder valueConverterBuilder, String connectionUsage) {
@@ -102,7 +102,7 @@ public class PostgresConnection extends JdbcConnection {
         else {
             this.typeRegistry = new TypeRegistry(this);
 
-            final PostgresValueConverter valueConverter = valueConverterBuilder.build(this.typeRegistry);
+            final KingBaseValueConverter valueConverter = valueConverterBuilder.build(this.typeRegistry);
             this.defaultValueConverter = new PostgresDefaultValueConverter(valueConverter, this.getTimestampUtils());
         }
     }
@@ -121,7 +121,7 @@ public class PostgresConnection extends JdbcConnection {
         }
         else {
             this.typeRegistry = typeRegistry;
-            final PostgresValueConverter valueConverter = PostgresValueConverter.of(config, this.getDatabaseCharset(), typeRegistry);
+            final KingBaseValueConverter valueConverter = KingBaseValueConverter.of(config, this.getDatabaseCharset(), typeRegistry);
             this.defaultValueConverter = new PostgresDefaultValueConverter(valueConverter, this.getTimestampUtils());
         }
     }
@@ -641,7 +641,7 @@ public class PostgresConnection extends JdbcConnection {
                         return s;
                     }
 
-                    Optional<SpecialValueDecimal> value = PostgresValueConverter.toSpecialValue(s);
+                    Optional<SpecialValueDecimal> value = KingBaseValueConverter.toSpecialValue(s);
                     return value.isPresent() ? value.get() : new SpecialValueDecimal(rs.getBigDecimal(columnIndex));
                 case PgOid.TIME:
                     // To handle time 24:00:00 supported by TIME columns, read the column as a string.
@@ -690,6 +690,6 @@ public class PostgresConnection extends JdbcConnection {
 
     @FunctionalInterface
     public interface PostgresValueConverterBuilder {
-        PostgresValueConverter build(TypeRegistry registry);
+        KingBaseValueConverter build(TypeRegistry registry);
     }
 }

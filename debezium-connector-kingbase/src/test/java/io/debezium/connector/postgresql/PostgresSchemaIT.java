@@ -446,7 +446,7 @@ public class PostgresSchemaIT {
         PostgresConnectorConfig config = new PostgresConnectorConfig(TestHelper.defaultConfig().build());
         schema = TestHelper.getSchema(config);
 
-        final PostgresConnection.PostgresValueConverterBuilder valueConverterBuilder = (typeRegistry) -> PostgresValueConverter.of(
+        final PostgresConnection.PostgresValueConverterBuilder valueConverterBuilder = (typeRegistry) -> KingBaseValueConverter.of(
                 config,
                 TestHelper.getDatabaseCharset(),
                 typeRegistry);

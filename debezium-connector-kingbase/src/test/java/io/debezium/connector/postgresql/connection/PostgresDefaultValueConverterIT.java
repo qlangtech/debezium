@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import io.debezium.config.Configuration;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;
-import io.debezium.connector.postgresql.PostgresValueConverter;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.connector.postgresql.TestHelper;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.doc.FixFor;
@@ -29,7 +29,7 @@ import io.debezium.relational.RelationalDatabaseConnectorConfig.DecimalHandlingM
 public class PostgresDefaultValueConverterIT {
 
     private PostgresConnection postgresConnection;
-    private PostgresValueConverter postgresValueConverter;
+    private KingBaseValueConverter postgresValueConverter;
     private PostgresDefaultValueConverter postgresDefaultValueConverter;
 
     @Before
@@ -39,7 +39,7 @@ public class PostgresDefaultValueConverterIT {
         postgresConnection = TestHelper.create();
 
         PostgresConnectorConfig postgresConnectorConfig = new PostgresConnectorConfig(defaultJdbcConfig());
-        postgresValueConverter = PostgresValueConverter.of(
+        postgresValueConverter = KingBaseValueConverter.of(
                 postgresConnectorConfig,
                 Charset.defaultCharset(),
                 new TypeRegistry(postgresConnection));
@@ -76,7 +76,7 @@ public class PostgresDefaultValueConverterIT {
                 .build();
 
         PostgresConnectorConfig postgresConnectorConfig = new PostgresConnectorConfig(config);
-        PostgresValueConverter postgresValueConverter = PostgresValueConverter.of(
+        KingBaseValueConverter postgresValueConverter = KingBaseValueConverter.of(
                 postgresConnectorConfig,
                 Charset.defaultCharset(),
                 new TypeRegistry(postgresConnection));
