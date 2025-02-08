@@ -74,7 +74,7 @@ public class ReplicationMessageColumnValueResolver {
                 return value.asInteger();
             // 百岁 baisui add for kingbase MySQL style 2025/02/08
             case "tinyint":
-                return new Short(value.asInteger().shortValue());
+                return new Byte(value.asInteger().byteValue());
             case "bigint":
             case "bigserial":
             case "int8":
