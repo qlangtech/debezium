@@ -27,6 +27,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.debezium.connector.postgresql.PostgresConnectorConfig.LogicalDecoder;
 import org.apache.kafka.connect.errors.ConnectException;
 import com.kingbase8.core.BaseConnection;
 import com.kingbase8.core.ServerVersion;
@@ -108,7 +109,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                                           TypeRegistry typeRegistry,
                                           Properties streamParams,
                                           PostgresSchema schema) {
-        super(addDefaultSettings(config.getJdbcConfig()), PostgresConnection.FACTORY, null, null, "\"", "\"");
+        super(addDefaultSettings(config.getJdbcConfig()), PostgresConnection.FACTORY, null, () -> PostgresReplicationConnection.class.getClassLoader(), "\"", "\"");
 
         this.connectorConfig = config;
         this.slotName = slotName;
@@ -145,7 +146,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
     protected void initPublication() {
         String createPublicationStmt;
         String tableFilterString = null;
-        if (PostgresConnectorConfig.LogicalDecoder.PGOUTPUT.equals(plugin)) {
+        if (LogicalDecoder.DECODERBUFS.equals(plugin)) {
             LOGGER.info("Initializing PgOutput logical decoder publication");
             try {
                 // Unless the autocommit is disabled the SELECT publication query will stay running
@@ -172,8 +173,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                                     createOrUpdatePublicationModeFilterted(tableFilterString, stmt, false);
                                     break;
                             }
-                        }
-                        else {
+                        } else {
                             switch (publicationAutocreateMode) {
                                 case FILTERED:
                                     createOrUpdatePublicationModeFilterted(tableFilterString, stmt, true);
@@ -190,8 +190,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                 }
                 conn.commit();
                 conn.setAutoCommit(true);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 throw new JdbcConnectionException(e);
             }
         }
@@ -209,8 +208,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                     : String.format("CREATE PUBLICATION %s FOR TABLE %s;", publicationName, tableFilterString);
             LOGGER.info(isUpdate ? "Updating Publication with statement '{}'" : "Creating Publication with statement '{}'", createOrUpdatePublicationStmt);
             stmt.execute(createOrUpdatePublicationStmt);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ConnectException(String.format("Unable to %s filtered publication %s for %s", isUpdate ? "update" : "create", publicationName, tableFilterString),
                     e);
         }
@@ -225,8 +223,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
             if (tableFilter.dataCollectionFilter().isIncluded(tableId)) {
                 LOGGER.trace("Adding table {} to the list of captured tables", tableId);
                 capturedTables.add(tableId);
-            }
-            else {
+            } else {
                 LOGGER.trace("Ignoring table {} as it's not included in the filter configuration", tableId);
             }
         }
@@ -263,12 +260,10 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
 
             if (slotCreationInfo != null) {
                 this.defaultStartingPos = slotCreationInfo.startLsn();
-            }
-            else if (shouldCreateSlot || !slotInfo.hasValidFlushedLsn()) {
+            } else if (shouldCreateSlot || !slotInfo.hasValidFlushedLsn()) {
                 // this is a new slot or we weren't able to read a valid flush LSN pos, so we always start from the xlog pos that was reported
                 this.defaultStartingPos = xlogStart;
-            }
-            else {
+            } else {
                 Lsn latestFlushedLsn = slotInfo.latestFlushedLsn();
                 this.defaultStartingPos = latestFlushedLsn.compareTo(xlogStart) < 0 ? latestFlushedLsn : xlogStart;
                 if (LOGGER.isDebugEnabled()) {
@@ -276,8 +271,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                 }
             }
             hasInitedSlot = true;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new JdbcConnectionException(e);
         }
     }
@@ -333,16 +327,14 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         while (true) {
             try {
                 return createReplicationStream(lsn, walPosition);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 String message = "Failed to start replication stream at " + lsn;
                 if (++tryCount > maxRetries) {
                     if (e.getMessage().matches(".*replication slot .* is active.*")) {
                         message += "; when setting up multiple connectors for the same database host, please make sure to use a distinct replication slot name for each.";
                     }
                     throw new DebeziumException(message, e);
-                }
-                else {
+                } else {
                     LOGGER.warn(message + ", waiting for {} ms and retrying, attempt number {} over {}", delay, tryCount, maxRetries);
                     final Metronome metronome = Metronome.sleeper(delay, Clock.SYSTEM);
                     metronome.pause();
@@ -385,11 +377,18 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         initPublication();
 
         try (Statement stmt = pgConnection().createStatement()) {
+//            String createCommand = String.format(
+//                    "CREATE_REPLICATION_SLOT \"%s\" %s LOGICAL %s",
+//                    slotName,
+//                    tempPart,
+//                    plugin.getPostgresPluginName());
+
             String createCommand = String.format(
-                    "CREATE_REPLICATION_SLOT \"%s\" %s LOGICAL %s",
+                    "SELECT * FROM pg_create_logical_replication_slot('%s', '%s')",
                     slotName,
-                    tempPart,
+                    // tempPart,
                     plugin.getPostgresPluginName());
+
             LOGGER.info("Creating replication slot with command {}", createCommand);
             stmt.execute(createCommand);
             // when we are in Postgres 9.4+, we can parse the slot creation info,
@@ -415,12 +414,10 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                 String pluginName = rs.getString("output_plugin");
 
                 return new SlotCreationResult(slotName, startPoint, snapName, pluginName);
-            }
-            else {
+            } else {
                 throw new ConnectException("No replication slot found");
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new ConnectException("Unable to parse create_replication_slot response", ex);
         }
     }
@@ -435,8 +432,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                                 ? messageDecoder::optionsWithoutMetadata
                                 : messageDecoder::optionsWithMetadata);
                 messageDecoder.setContainsMetadata(plugin.forceRds() ? false : true);
-            }
-            catch (KSQLException e) {
+            } catch (KSQLException e) {
                 LOGGER.debug("Could not register for streaming, retrying without optional options", e);
 
                 // re-init the slot after a failed start of slot, as this
@@ -448,8 +444,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                 s = startKBReplicationStream(startLsn, plugin.forceRds() ? messageDecoder::optionsWithoutMetadata : messageDecoder::optionsWithMetadata);
                 messageDecoder.setContainsMetadata(plugin.forceRds() ? false : true);
             }
-        }
-        catch (KSQLException e) {
+        } catch (KSQLException e) {
             if (e.getMessage().matches("(?s)ERROR: option .* is unknown.*")) {
                 // It is possible we are connecting to an old wal2json plug-in
                 LOGGER.warn("Could not register for streaming with metadata in messages, falling back to messages without metadata");
@@ -462,13 +457,11 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
 
                 s = startKBReplicationStream(startLsn, messageDecoder::optionsWithoutMetadata);
                 messageDecoder.setContainsMetadata(false);
-            }
-            else if (e.getMessage().matches("(?s)ERROR: requested WAL segment .* has already been removed.*")) {
+            } else if (e.getMessage().matches("(?s)ERROR: requested WAL segment .* has already been removed.*")) {
                 LOGGER.error("Cannot rewind to last processed WAL position", e);
                 throw new ConnectException(
                         "The offset to start reading from has been removed from the database write-ahead log. Create a new snapshot and consider setting of PostgreSQL parameter wal_keep_segments = 0.");
-            }
-            else {
+            } else {
                 throw e;
             }
         }
@@ -558,8 +551,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                                 LOGGER.trace("Forcing status update with replication stream");
                                 stream.forceUpdateStatus();
                                 metronome.pause();
-                            }
-                            catch (Exception exp) {
+                            } catch (Exception exp) {
                                 throw new RuntimeException("received unexpected exception will perform keep alive", exp);
                             }
                         }
@@ -617,8 +609,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         // Needed by tests when connections are opened and closed in a fast sequence
         try {
             Thread.sleep(10);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
         }
         stream.forceUpdateStatus();
         return stream;
@@ -627,8 +618,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
     private Boolean hasMinimumVersion(int version) {
         try {
             return pgConnection().haveMinimumServerVersion(version);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DebeziumException(e);
         }
     }
@@ -642,24 +632,21 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         try {
             LOGGER.debug("Closing message decoder");
             messageDecoder.close();
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOGGER.error("Unexpected error while closing message decoder", e);
         }
 
         try {
             LOGGER.debug("Closing replication connection");
             super.close();
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOGGER.error("Unexpected error while closing Postgres connection", e);
         }
         if (dropSlotOnClose && dropSlot) {
             // we're dropping the replication slot via a regular - i.e. not a replication - connection
             try (PostgresConnection connection = new PostgresConnection(connectorConfig.getJdbcConfig(), PostgresConnection.CONNECTION_DROP_SLOT)) {
                 connection.dropReplicationSlot(slotName);
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 LOGGER.error("Unexpected error while dropping replication slot", e);
             }
         }
@@ -743,8 +730,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                     String[] paramAndValue = paramsWithValue.split("=");
                     if (paramAndValue.length == 2) {
                         this.slotStreamParams.setProperty(paramAndValue[0], paramAndValue[1]);
-                    }
-                    else {
+                    } else {
                         LOGGER.warn("The following STREAM_PARAMS value is invalid: {}", paramsWithValue);
                     }
                 }

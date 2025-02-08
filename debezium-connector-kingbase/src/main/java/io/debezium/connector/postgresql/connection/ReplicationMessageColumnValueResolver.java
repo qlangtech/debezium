@@ -71,6 +71,8 @@ public class ReplicationMessageColumnValueResolver {
             case "serial":
             case "serial2":
             case "serial4":
+                // 百岁 baisui add for kingbase MySQL style 2025/02/08
+            case "tinyint":
                 return value.asInteger();
 
             case "bigint":

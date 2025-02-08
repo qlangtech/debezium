@@ -46,6 +46,7 @@
             <groupId>cn.com.kingbase</groupId>
             <artifactId>kingbase8</artifactId>
             <version>8.6.1</version>
+            <scope>provided</scope>
         </dependency>
 
 <!--        <dependency>-->
@@ -124,12 +125,35 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${protobuf.output.directory}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>com.github.os72</groupId>
                 <artifactId>protoc-jar-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+<!--                        <phase>generate-sources</phase>-->
+                        <!--平时先不执行-->
+                        <phase>none</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -192,7 +216,8 @@
                 <executions>
                     <execution>
                         <id>start</id>
-                        <phase>pre-integration-test</phase>
+<!--                        <phase>pre-integration-test</phase>-->
+                        <phase>none</phase>
                         <goals>
                             <goal>build</goal>
                             <goal>start</goal>
@@ -200,7 +225,8 @@
                     </execution>
                     <execution>
                         <id>stop</id>
-                        <phase>post-integration-test</phase>
+<!--                        <phase>post-integration-test</phase>-->
+                        <phase>none</phase>
                         <goals>
                             <goal>stop</goal>
                         </goals>

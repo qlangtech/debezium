@@ -378,7 +378,8 @@ public class PostgresConnectorConfig extends RelationalDatabaseConnectorConfig {
             public boolean supportsLogicalDecodingMessage() {
                 return true;
             }
-        },
+        }
+        ,
         DECODERBUFS("decoderbufs") {
             @Override
             public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
@@ -399,145 +400,147 @@ public class PostgresConnectorConfig extends RelationalDatabaseConnectorConfig {
             public boolean supportsLogicalDecodingMessage() {
                 return false;
             }
-        },
-        @Deprecated
-        WAL2JSON_STREAMING("wal2json_streaming") {
-            @Override
-            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
-                return new StreamingWal2JsonMessageDecoder();
-            }
-
-            @Override
-            public String getPostgresPluginName() {
-                return "wal2json";
-            }
-
-            @Override
-            public boolean supportsTruncate() {
-                return false;
-            }
-
-            @Override
-            public boolean hasUnchangedToastColumnMarker() {
-                return false;
-            }
-
-            @Override
-            public boolean sendsNullToastedValuesInOld() {
-                return false;
-            }
-
-            @Override
-            public boolean supportsLogicalDecodingMessage() {
-                return false;
-            }
-        },
-        @Deprecated
-        WAL2JSON_RDS_STREAMING("wal2json_rds_streaming") {
-            @Override
-            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
-                return new StreamingWal2JsonMessageDecoder();
-            }
-
-            @Override
-            public boolean forceRds() {
-                return true;
-            }
-
-            @Override
-            public String getPostgresPluginName() {
-                return "wal2json";
-            }
-
-            @Override
-            public boolean supportsTruncate() {
-                return false;
-            }
-
-            @Override
-            public boolean hasUnchangedToastColumnMarker() {
-                return false;
-            }
-
-            @Override
-            public boolean sendsNullToastedValuesInOld() {
-                return false;
-            }
-
-            @Override
-            public boolean supportsLogicalDecodingMessage() {
-                return false;
-            }
-        },
-        @Deprecated
-        WAL2JSON("wal2json") {
-            @Override
-            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
-                return new NonStreamingWal2JsonMessageDecoder();
-            }
-
-            @Override
-            public String getPostgresPluginName() {
-                return "wal2json";
-            }
-
-            @Override
-            public boolean supportsTruncate() {
-                return false;
-            }
-
-            @Override
-            public boolean hasUnchangedToastColumnMarker() {
-                return false;
-            }
-
-            @Override
-            public boolean sendsNullToastedValuesInOld() {
-                return false;
-            }
-
-            @Override
-            public boolean supportsLogicalDecodingMessage() {
-                return true;
-            }
-        },
-        @Deprecated
-        WAL2JSON_RDS("wal2json_rds") {
-            @Override
-            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
-                return new NonStreamingWal2JsonMessageDecoder();
-            }
-
-            @Override
-            public boolean forceRds() {
-                return true;
-            }
-
-            @Override
-            public String getPostgresPluginName() {
-                return "wal2json";
-            }
-
-            @Override
-            public boolean supportsTruncate() {
-                return false;
-            }
-
-            @Override
-            public boolean hasUnchangedToastColumnMarker() {
-                return false;
-            }
-
-            @Override
-            public boolean sendsNullToastedValuesInOld() {
-                return false;
-            }
-
-            @Override
-            public boolean supportsLogicalDecodingMessage() {
-                return false;
-            }
-        };
+        }
+//        ,
+//        @Deprecated
+//        WAL2JSON_STREAMING("wal2json_streaming") {
+//            @Override
+//            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
+//                return new StreamingWal2JsonMessageDecoder();
+//            }
+//
+//            @Override
+//            public String getPostgresPluginName() {
+//                return "wal2json";
+//            }
+//
+//            @Override
+//            public boolean supportsTruncate() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean hasUnchangedToastColumnMarker() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean sendsNullToastedValuesInOld() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean supportsLogicalDecodingMessage() {
+//                return false;
+//            }
+//        },
+//        @Deprecated
+//        WAL2JSON_RDS_STREAMING("wal2json_rds_streaming") {
+//            @Override
+//            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
+//                return new StreamingWal2JsonMessageDecoder();
+//            }
+//
+//            @Override
+//            public boolean forceRds() {
+//                return true;
+//            }
+//
+//            @Override
+//            public String getPostgresPluginName() {
+//                return "wal2json";
+//            }
+//
+//            @Override
+//            public boolean supportsTruncate() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean hasUnchangedToastColumnMarker() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean sendsNullToastedValuesInOld() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean supportsLogicalDecodingMessage() {
+//                return false;
+//            }
+//        },
+//        @Deprecated
+//        WAL2JSON("wal2json") {
+//            @Override
+//            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
+//                return new NonStreamingWal2JsonMessageDecoder();
+//            }
+//
+//            @Override
+//            public String getPostgresPluginName() {
+//                return "wal2json";
+//            }
+//
+//            @Override
+//            public boolean supportsTruncate() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean hasUnchangedToastColumnMarker() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean sendsNullToastedValuesInOld() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean supportsLogicalDecodingMessage() {
+//                return true;
+//            }
+//        },
+//        @Deprecated
+//        WAL2JSON_RDS("wal2json_rds") {
+//            @Override
+//            public MessageDecoder messageDecoder(MessageDecoderContext config, PostgresConnection connection) {
+//                return new NonStreamingWal2JsonMessageDecoder();
+//            }
+//
+//            @Override
+//            public boolean forceRds() {
+//                return true;
+//            }
+//
+//            @Override
+//            public String getPostgresPluginName() {
+//                return "wal2json";
+//            }
+//
+//            @Override
+//            public boolean supportsTruncate() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean hasUnchangedToastColumnMarker() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean sendsNullToastedValuesInOld() {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean supportsLogicalDecodingMessage() {
+//                return false;
+//            }
+//        }
+        ;
 
         private final String decoderName;
 
@@ -686,7 +689,7 @@ public class PostgresConnectorConfig extends RelationalDatabaseConnectorConfig {
             .withValidation(PostgresConnectorConfig::validatePluginName)
             .withDescription("The name of the Postgres logical decoding plugin installed on the server. " +
                     "Supported values are '" + LogicalDecoder.DECODERBUFS.getValue()
-                    + "' and '" + LogicalDecoder.PGOUTPUT.getValue()
+                    + "' and '" + LogicalDecoder.DECODERBUFS.getValue()
                     + "'. " +
                     "Defaults to '" + LogicalDecoder.DECODERBUFS.getValue() + "'.");
 

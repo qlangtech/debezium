@@ -507,6 +507,6 @@ public class TypeRegistry {
     }
 
     private static TypeInfo getTypeInfo(PostgresConnection connection) throws SQLException {
-        return ((BaseConnection) connection.connection()).getTypeInfo();
+         return ((BaseConnection) connection.connection()).getTypeInfo();
     }
 }

@@ -3,27 +3,32 @@
  *
  * Licensed under the Apache Software License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
  */
-package io.debezium.connector.postgresql.connection;
 
-import java.nio.ByteBuffer;
+package io.debezium.connector.postgresql.connection;
 
 import com.kingbase8.replication.LogSequenceNumber;
 
+import java.nio.ByteBuffer;
+
 /**
- * Abstraction of PostgreSQL log sequence number, adapted from
- * {@link org.postgresql.replication.LogSequenceNumber}.
+ * Copied from Debezium 1.9.8.final without changes due to the NoSuchMethodError, caused by the fact
+ * that current Debezium release java version is 11, so we need to compile this file by java 8
+ * compiler. <a
+ * href="https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/">More info</a>.
+ * Abstraction of PostgreSQL log sequence number, adapted from {@link LogSequenceNumber}.
  *
- * @author Jiri Pechanec
- *
+ * <p>Line 32: add NO_STOPPING_LSN
  */
 public class Lsn implements Comparable<Lsn> {
 
     /**
-     * Zero is used indicate an invalid pointer. Bootstrap skips the first
-     * possible WAL segment, initializing the first WAL page at XLOG_SEG_SIZE,
-     * so no XLOG record can begin at zero.
+     * Zero is used indicate an invalid pointer. Bootstrap skips the first possible WAL segment,
+     * initializing the first WAL page at XLOG_SEG_SIZE, so no XLOG record can begin at zero.
      */
     public static final Lsn INVALID_LSN = new Lsn(0);
+
+    /** The max lsn for the wal file. */
+    public static final Lsn NO_STOPPING_LSN = Lsn.valueOf("FFFFFFFF/FFFFFFFF");
 
     private final long value;
 
@@ -32,8 +37,7 @@ public class Lsn implements Comparable<Lsn> {
     }
 
     /**
-     * @param value
-     *            numeric represent position in the write-ahead log stream
+     * @param value numeric represent position in the write-ahead log stream
      * @return not null LSN instance
      */
     public static Lsn valueOf(Long value) {
@@ -47,8 +51,8 @@ public class Lsn implements Comparable<Lsn> {
     }
 
     /**
-     * @param value
-     *            PostgreSQL JDBC driver domain type representing position in the write-ahead log stream
+     * @param value PostgreSQL JDBC driver domain type representing position in the write-ahead log
+     *     stream
      * @return not null LSN instance
      */
     public static Lsn valueOf(LogSequenceNumber value) {
@@ -61,12 +65,10 @@ public class Lsn implements Comparable<Lsn> {
     /**
      * Create LSN instance by string represent LSN.
      *
-     * @param strValue
-     *            not null string as two hexadecimal numbers of up to 8 digits
-     *            each, separated by a slash. For example {@code 16/3002D50},
-     *            {@code 0/15D68C50}
-     * @return not null LSN instance where if specified string represent have
-     *         not valid form {@link Lsn#INVALID_LSN}
+     * @param strValue not null string as two hexadecimal numbers of up to 8 digits each, separated
+     *     by a slash. For example {@code 16/3002D50}, {@code 0/15D68C50}
+     * @return not null LSN instance where if specified string represent have not valid form {@link
+     *     Lsn#INVALID_LSN}
      */
     public static Lsn valueOf(String strValue) {
         final int slashIndex = strValue.lastIndexOf('/');
@@ -83,35 +85,31 @@ public class Lsn implements Comparable<Lsn> {
         final ByteBuffer buf = ByteBuffer.allocate(8);
         buf.putInt(logicalXlog);
         buf.putInt(segment);
-        buf.position(0);
+        ((java.nio.Buffer) buf).position(0);
         final long value = buf.getLong();
 
         return Lsn.valueOf(value);
     }
 
-    /**
-     * @return Long represent position in the write-ahead log stream
-     */
+    /** @return Long represent position in the write-ahead log stream */
     public long asLong() {
         return value;
     }
 
-    /**
-     * @return PostgreSQL JDBC driver representation of position in the write-ahead log stream
-     */
+    /** @return PostgreSQL JDBC driver representation of position in the write-ahead log stream */
     public LogSequenceNumber asLogSequenceNumber() {
         return LogSequenceNumber.valueOf(value);
     }
 
     /**
-     * @return String represent position in the write-ahead log stream as two
-     *         hexadecimal numbers of up to 8 digits each, separated by a slash.
-     *         For example {@code 16/3002D50}, {@code 0/15D68C50}
+     * @return String represent position in the write-ahead log stream as two hexadecimal numbers of
+     *     up to 8 digits each, separated by a slash. For example {@code 16/3002D50}, {@code
+     *     0/15D68C50}
      */
     public String asString() {
         final ByteBuffer buf = ByteBuffer.allocate(8);
         buf.putLong(value);
-        buf.position(0);
+        ((java.nio.Buffer) buf).position(0);
 
         final int logicalXlog = buf.getInt();
         final int segment = buf.getInt();
@@ -130,7 +128,6 @@ public class Lsn implements Comparable<Lsn> {
         final Lsn that = (Lsn) o;
 
         return value == that.value;
-
     }
 
     @Override
@@ -140,6 +137,10 @@ public class Lsn implements Comparable<Lsn> {
 
     public boolean isValid() {
         return this != INVALID_LSN;
+    }
+
+    public boolean isNonStopping() {
+        return this == NO_STOPPING_LSN;
     }
 
     @Override

@@ -22,15 +22,17 @@ message DatumMessage {
     optional string column_name = 1;
     optional int64 column_type = 2;
     oneof datum {
-      int32 datum_int32 = 3;
-      int64 datum_int64 = 4;
-      float datum_float = 5;
-      double datum_double = 6;
-      bool datum_bool = 7;
-      string datum_string = 8;
-      bytes datum_bytes = 9;
-      Point datum_point = 10;
-      bool datum_missing = 11;
+            // guess
+            bool datum_null = 3;
+            int32 datum_int32 = 4;
+            int64 datum_int64 = 5;
+            float datum_float = 6;
+            double datum_double = 7;
+            bool datum_bool = 8;
+            string datum_string = 9;
+            bytes datum_bytes = 10;
+            Point datum_point = 11;
+            bool datum_missing = 12;
     }
 }
 
@@ -42,9 +44,12 @@ message TypeInfo {
 message RowMessage {
     optional uint32 transaction_id = 1;
     optional uint64 commit_time = 2;
-    optional string table = 3;
-    optional Op op = 4;
-    repeated DatumMessage new_tuple = 5;
-    repeated DatumMessage old_tuple = 6;
-    repeated TypeInfo new_typeinfo = 7;
+    optional string schema = 3;
+    optional string table = 4;
+    optional Op op = 5;
+    repeated DatumMessage new_tuple = 6;
+    repeated DatumMessage old_tuple = 7;
+    repeated TypeInfo new_typeinfo = 8;
+    repeated uint64 unknown_9 = 9;
+    repeated uint64 unknown_10 = 10;
 }
