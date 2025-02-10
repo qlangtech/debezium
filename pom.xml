@@ -23,6 +23,18 @@
         <tag>v1.9.8.Final</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>oss://maven.qlangtech.com/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>oss://maven.qlangtech.com/snapshot</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <issueManagement>
         <system>jira</system>
         <url>http://issues.jboss.org/browse/DBZ</url>
@@ -137,6 +149,7 @@
 
         <!-- Required in protoc plug-in config, too; can't be in BOM therefore -->
         <version.com.google.protobuf>3.19.6</version.com.google.protobuf>
+        <oss-storage-wagon.version>4.2.0</oss-storage-wagon.version>
     </properties>
 
     <modules>
@@ -166,18 +179,18 @@
         <module>debezium-schema-generator</module>
     </modules>
 
-    <distributionManagement>
-      <repository>
-        <id>ossrh</id>
-        <name>Sonatype Staging Repository</name>
-        <url>${release.endpoint}/service/local/staging/deploy/maven2</url>
-      </repository>
-      <snapshotRepository>
-        <id>ossrh</id>
-        <name>OSS Sonatype Nexus Snapshots</name>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-    </distributionManagement>
+<!--    <distributionManagement>-->
+<!--      <repository>-->
+<!--        <id>ossrh</id>-->
+<!--        <name>Sonatype Staging Repository</name>-->
+<!--        <url>${release.endpoint}/service/local/staging/deploy/maven2</url>-->
+<!--      </repository>-->
+<!--      <snapshotRepository>-->
+<!--        <id>ossrh</id>-->
+<!--        <name>OSS Sonatype Nexus Snapshots</name>-->
+<!--        <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--      </snapshotRepository>-->
+<!--    </distributionManagement>-->
 
     <repositories>
         <repository>
@@ -205,6 +218,13 @@
     </repositories>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>com.qlangtech.maven.cloud</groupId>
+                <artifactId>oss-storage-wagon</artifactId>
+                <version>${oss-storage-wagon.version}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -283,16 +303,16 @@
                     <releaseProfiles>docs,assembly,release-sign-artifacts,release</releaseProfiles>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>${release.endpoint}</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.sonatype.plugins</groupId>-->
+<!--                <artifactId>nexus-staging-maven-plugin</artifactId>-->
+<!--                <extensions>true</extensions>-->
+<!--                <configuration>-->
+<!--                    <serverId>ossrh</serverId>-->
+<!--                    <nexusUrl>${release.endpoint}</nexusUrl>-->
+<!--                    <autoReleaseAfterClose>false</autoReleaseAfterClose>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
