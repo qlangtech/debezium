@@ -35,7 +35,6 @@ import io.debezium.util.Collect;
  * type name or OID.
  *
  * @author Jiri Pechanec
- *
  */
 public class TypeRegistry {
 
@@ -121,8 +120,7 @@ public class TypeRegistry {
             sqlTypeMapper = new SqlTypeMapper(this.connection);
 
             prime();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DebeziumException("Couldn't initialize type registry", e);
         }
     }
@@ -133,38 +131,28 @@ public class TypeRegistry {
 
         if (TYPE_NAME_GEOMETRY.equals(type.getName())) {
             geometryOid = type.getOid();
-        }
-        else if (TYPE_NAME_GEOGRAPHY.equals(type.getName())) {
+        } else if (TYPE_NAME_GEOGRAPHY.equals(type.getName())) {
             geographyOid = type.getOid();
-        }
-        else if (TYPE_NAME_CITEXT.equals(type.getName())) {
+        } else if (TYPE_NAME_CITEXT.equals(type.getName())) {
             citextOid = type.getOid();
-        }
-        else if (TYPE_NAME_HSTORE.equals(type.getName())) {
+        } else if (TYPE_NAME_HSTORE.equals(type.getName())) {
             hstoreOid = type.getOid();
-        }
-        else if (TYPE_NAME_LTREE.equals(type.getName())) {
+        } else if (TYPE_NAME_LTREE.equals(type.getName())) {
             ltreeOid = type.getOid();
-        }
-        else if (TYPE_NAME_HSTORE_ARRAY.equals(type.getName())) {
+        } else if (TYPE_NAME_HSTORE_ARRAY.equals(type.getName())) {
             hstoreArrayOid = type.getOid();
-        }
-        else if (TYPE_NAME_GEOMETRY_ARRAY.equals(type.getName())) {
+        } else if (TYPE_NAME_GEOMETRY_ARRAY.equals(type.getName())) {
             geometryArrayOid = type.getOid();
-        }
-        else if (TYPE_NAME_GEOGRAPHY_ARRAY.equals(type.getName())) {
+        } else if (TYPE_NAME_GEOGRAPHY_ARRAY.equals(type.getName())) {
             geographyArrayOid = type.getOid();
-        }
-        else if (TYPE_NAME_CITEXT_ARRAY.equals(type.getName())) {
+        } else if (TYPE_NAME_CITEXT_ARRAY.equals(type.getName())) {
             citextArrayOid = type.getOid();
-        }
-        else if (TYPE_NAME_LTREE_ARRAY.equals(type.getName())) {
+        } else if (TYPE_NAME_LTREE_ARRAY.equals(type.getName())) {
             ltreeArrayOid = type.getOid();
         }
     }
 
     /**
-     *
      * @param oid - PostgreSQL OID
      * @return type associated with the given OID
      */
@@ -181,7 +169,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @param name - PostgreSQL type name
      * @return type associated with the given type name
      */
@@ -197,6 +184,32 @@ public class TypeRegistry {
                 name = "int8";
                 break;
         }
+
+        // baisui add for MySQL model 2025/02/24
+        switch (name.split("\\s")[0]) {
+            case "bigint": {
+                name = "int8";
+                break;
+            }
+            case "smallint": {
+                name = "int2";
+                break;
+            }
+            case "int": {
+                name = "int4";
+                break;
+            }
+            case "decimal": {
+                name = "numeric";
+                break;
+            }
+            case "double": {
+                name = "float8";
+                break;
+            }
+        }
+
+
         String[] parts = name.split("\\.");
         if (parts.length > 1) {
             name = parts[1];
@@ -216,7 +229,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for {@code GEOMETRY} type of this PostgreSQL instance
      */
     public int geometryOid() {
@@ -224,7 +236,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for {@code GEOGRAPHY} type of this PostgreSQL instance
      */
     public int geographyOid() {
@@ -232,7 +243,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for {@code CITEXT} type of this PostgreSQL instance
      */
     public int citextOid() {
@@ -240,7 +250,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for {@code HSTORE} type of this PostgreSQL instance
      */
     public int hstoreOid() {
@@ -248,7 +257,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for {@code LTREE} type of this PostgreSQL instance
      */
     public int ltreeOid() {
@@ -256,15 +264,13 @@ public class TypeRegistry {
     }
 
     /**
-    *
-    * @return OID for array of {@code HSTORE} type of this PostgreSQL instance
-    */
+     * @return OID for array of {@code HSTORE} type of this PostgreSQL instance
+     */
     public int hstoreArrayOid() {
         return hstoreArrayOid;
     }
 
     /**
-     *
      * @return OID for array of {@code GEOMETRY} type of this PostgreSQL instance
      */
     public int geometryArrayOid() {
@@ -272,7 +278,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for array of {@code GEOGRAPHY} type of this PostgreSQL instance
      */
     public int geographyArrayOid() {
@@ -280,7 +285,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for array of {@code CITEXT} type of this PostgreSQL instance
      */
     public int citextArrayOid() {
@@ -288,7 +292,6 @@ public class TypeRegistry {
     }
 
     /**
-     *
      * @return OID for array of {@code LTREE} type of this PostgreSQL instance
      */
     public int ltreeArrayOid() {
@@ -311,7 +314,7 @@ public class TypeRegistry {
      */
     private void prime() throws SQLException {
         try (final Statement statement = connection.connection().createStatement();
-                final ResultSet rs = statement.executeQuery(SQL_TYPES)) {
+             final ResultSet rs = statement.executeQuery(SQL_TYPES)) {
             final List<PostgresType.Builder> delayResolvedBuilders = new ArrayList<>();
             while (rs.next()) {
                 PostgresType.Builder builder = createTypeBuilderFromResultSet(rs);
@@ -353,8 +356,7 @@ public class TypeRegistry {
         if (CATEGORY_ENUM.equals(category)) {
             String[] enumValues = (String[]) rs.getArray("enum_values").getArray();
             builder = builder.enumValues(Arrays.asList(enumValues));
-        }
-        else if (CATEGORY_ARRAY.equals(category)) {
+        } else if (CATEGORY_ARRAY.equals(category)) {
             builder = builder.elementType((int) rs.getLong("element"));
         }
         return builder.parentType(parentTypeOid);
@@ -368,8 +370,7 @@ public class TypeRegistry {
                 statement.setString(1, name);
                 return loadType(statement);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new ConnectException("Database connection failed during resolving unknown type", e);
         }
     }
@@ -382,8 +383,7 @@ public class TypeRegistry {
                 statement.setInt(1, lookupOid);
                 return loadType(statement);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new ConnectException("Database connection failed during resolving unknown type", e);
         }
     }
@@ -461,8 +461,7 @@ public class TypeRegistry {
                     }
                     LOGGER.info("Failed to obtain SQL type information for type {} via custom statement, falling back to TypeInfo#getSQLType()", typeName);
                     return getTypeInfo(connection).getSQLType(typeName);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOGGER.warn("Failed to obtain SQL type information for type {} via custom statement, falling back to TypeInfo#getSQLType()", typeName, e);
                     return getTypeInfo(connection).getSQLType(typeName);
                 }
@@ -483,17 +482,13 @@ public class TypeRegistry {
                         String typtype = rs.getString(3);
                         if (isArray) {
                             type = Types.ARRAY;
-                        }
-                        else if ("c".equals(typtype)) {
+                        } else if ("c".equals(typtype)) {
                             type = Types.STRUCT;
-                        }
-                        else if ("d".equals(typtype)) {
+                        } else if ("d".equals(typtype)) {
                             type = Types.DISTINCT;
-                        }
-                        else if ("e".equals(typtype)) {
+                        } else if ("e".equals(typtype)) {
                             type = Types.VARCHAR;
-                        }
-                        else {
+                        } else {
                             type = Types.OTHER;
                         }
 
@@ -507,6 +502,6 @@ public class TypeRegistry {
     }
 
     private static TypeInfo getTypeInfo(PostgresConnection connection) throws SQLException {
-         return ((BaseConnection) connection.connection()).getTypeInfo();
+        return ((BaseConnection) connection.connection()).getTypeInfo();
     }
 }
