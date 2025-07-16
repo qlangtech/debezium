@@ -69,7 +69,8 @@ class PgProtoReplicationMessage implements ReplicationMessage {
 
     @Override
     public String getTable() {
-        return rawMessage.getTable();
+        // 2025/07/16 百岁 add for kingbase adapter
+        return rawMessage.getSchema() +"."+ rawMessage.getTable();
     }
 
     @Override
