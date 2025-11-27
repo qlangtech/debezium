@@ -1,0 +1,1 @@
+copy from: https://github.com/devlive-community/dameng-connector/tree/dev/debezium-connector

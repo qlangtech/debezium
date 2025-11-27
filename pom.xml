@@ -168,6 +168,7 @@
         <module>debezium-connector-kingbase</module>
         <module>debezium-connector-mongodb</module>
         <module>debezium-connector-sqlserver</module>
+        <module>debezium-connector-dameng</module>
         <module>debezium-connector-oracle</module>
         <module>debezium-microbenchmark</module>
         <module>debezium-microbenchmark-oracle</module>
