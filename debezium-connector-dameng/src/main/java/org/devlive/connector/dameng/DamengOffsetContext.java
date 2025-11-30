@@ -7,6 +7,7 @@ package org.devlive.connector.dameng;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.debezium.connector.SnapshotRecord;
+import io.debezium.connector.oracle.Scn;
 import io.debezium.pipeline.spi.OffsetContext;
 import io.debezium.pipeline.txmetadata.TransactionContext;
 import io.debezium.relational.TableId;
@@ -38,7 +39,7 @@ public class DamengOffsetContext
     private boolean snapshotCompleted;
 
     public DamengOffsetContext(DamengConnectorConfig connectorConfig, Scn scn, Scn commitScn,
-            boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext)
+                               boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext)
     {
         this(connectorConfig, scn, snapshot, snapshotCompleted, transactionContext);
         sourceInfo.setCommitScn(commitScn);

@@ -10,6 +10,7 @@ import io.debezium.annotation.ThreadSafe;
 import io.debezium.annotation.VisibleForTesting;
 import io.debezium.connector.base.ChangeEventQueueMetrics;
 import io.debezium.connector.common.CdcSourceTaskContext;
+import io.debezium.connector.oracle.Scn;
 import io.debezium.data.Envelope;
 import io.debezium.pipeline.ConnectorEvent;
 import io.debezium.pipeline.metrics.StreamingChangeEventSourceMetrics;

@@ -85,6 +85,9 @@ public class DamengConnection
 
     private static ConnectionFactory resolveConnectionFactory(Configuration config)
     {
+
+
+
         // return JdbcConnection.patternBasedFactory(connectionString(config));
         return JdbcConnection.patternBasedFactory(
                 "jdbc:dm://${hostname}:${port}/${dbname}",

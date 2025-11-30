@@ -44,6 +44,7 @@ import oracle.jdbc.OracleTypes;
 
 public class OracleConnection extends JdbcConnection {
 
+    public static final String SHOW_CURRENT_SCN = "SELECT CURRENT_SCN FROM V$DATABASE";
     private final static Logger LOGGER = LoggerFactory.getLogger(OracleConnection.class);
 
     /**

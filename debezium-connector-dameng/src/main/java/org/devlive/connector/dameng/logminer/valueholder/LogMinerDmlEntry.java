@@ -6,7 +6,7 @@
 package org.devlive.connector.dameng.logminer.valueholder;
 
 import io.debezium.data.Envelope;
-import org.devlive.connector.dameng.Scn;
+import io.debezium.connector.oracle.Scn;
 
 import java.sql.Timestamp;
 import java.util.List;

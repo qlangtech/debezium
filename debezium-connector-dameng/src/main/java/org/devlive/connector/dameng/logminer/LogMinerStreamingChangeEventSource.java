@@ -23,7 +23,7 @@ import org.devlive.connector.dameng.DamengOffsetContext;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
 import org.devlive.connector.dameng.DamengTaskContext;
 import org.devlive.connector.dameng.MapBackedPartition;
-import org.devlive.connector.dameng.Scn;
+import io.debezium.connector.oracle.Scn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,6 +7,7 @@ package org.devlive.connector.dameng;
 
 import io.debezium.annotation.NotThreadSafe;
 import io.debezium.connector.common.BaseSourceInfo;
+import io.debezium.connector.oracle.Scn;
 import io.debezium.relational.TableId;
 
 import java.time.Instant;

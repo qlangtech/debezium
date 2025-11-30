@@ -20,7 +20,7 @@ import org.devlive.connector.dameng.DamengOffsetContext;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
 import org.devlive.connector.dameng.DamengValueConverters;
 import org.devlive.connector.dameng.MapBackedPartition;
-import org.devlive.connector.dameng.Scn;
+import io.debezium.connector.oracle.Scn;
 import org.devlive.connector.dameng.logminer.parser.DmlParser;
 import org.devlive.connector.dameng.logminer.parser.DmlParserException;
 import org.devlive.connector.dameng.logminer.parser.LogMinerDmlParser;

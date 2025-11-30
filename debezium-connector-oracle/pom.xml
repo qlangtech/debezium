@@ -7,7 +7,7 @@
 	<relativePath>../debezium-parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>debezium-connector-oracle</artifactId>
+    <artifactId>debezium-connector-oracle-tis</artifactId>
     <name>Debezium Connector for Oracle</name>
     <packaging>jar</packaging>
 

@@ -5,7 +5,7 @@
  */
 package org.devlive.connector.dameng.logminer;
 
-import org.devlive.connector.dameng.Scn;
+import io.debezium.connector.oracle.Scn;
 
 import java.util.Objects;
 

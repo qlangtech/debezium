@@ -16,7 +16,7 @@ import org.devlive.connector.dameng.DamengConnection;
 import org.devlive.connector.dameng.DamengConnectorConfig;
 import org.devlive.connector.dameng.DamengDatabaseSchema;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
-import org.devlive.connector.dameng.Scn;
+import io.debezium.connector.oracle.Scn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
