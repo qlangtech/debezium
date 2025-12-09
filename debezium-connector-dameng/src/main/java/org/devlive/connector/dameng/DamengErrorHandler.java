@@ -17,31 +17,27 @@ import java.sql.SQLRecoverableException;
  * @author Chris Cranford
  */
 public class DamengErrorHandler
-        extends ErrorHandler
-{
+        extends ErrorHandler {
     /**
      * 新版本构造函数，适配Debezium 1.9.8.Final
      */
-    public DamengErrorHandler(String logicalName, ChangeEventQueue<?> queue)
-    {
+    public DamengErrorHandler(String logicalName, ChangeEventQueue<?> queue) {
         super(DamengConnector.class, new DamengConnectorConfig(
-                        io.debezium.config.Configuration.create()
-                                .with(DamengConnectorConfig.SERVER_NAME, logicalName)
-                                .build()),
+                io.debezium.config.Configuration.create()
+                        .with(DamengConnectorConfig.SERVER_NAME, logicalName)
+                        .build()),
                 queue);
     }
 
     /**
      * 新增一个构造函数，接受DamengConnectorConfig参数
      */
-    public DamengErrorHandler(DamengConnectorConfig connectorConfig, ChangeEventQueue<?> queue)
-    {
+    public DamengErrorHandler(DamengConnectorConfig connectorConfig, ChangeEventQueue<?> queue) {
         super(DamengConnector.class, connectorConfig, queue);
     }
 
     @Override
-    protected boolean isRetriable(Throwable throwable)
-    {
+    protected boolean isRetriable(Throwable throwable) {
         if (throwable.getMessage() == null || throwable.getCause() == null) {
             return false;
         }

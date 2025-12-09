@@ -11,12 +11,10 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 
 public class DamengSourceInfoStructMaker
-        extends AbstractSourceInfoStructMaker<SourceInfo>
-{
+        extends AbstractSourceInfoStructMaker<SourceInfo> {
     private final Schema schema;
 
-    public DamengSourceInfoStructMaker(String connector, String version, CommonConnectorConfig connectorConfig)
-    {
+    public DamengSourceInfoStructMaker(String connector, String version, CommonConnectorConfig connectorConfig) {
         super(connector, version, connectorConfig);
         schema = commonSchemaBuilder()
                 .name("io.debezium.connector.dameng.Source")
@@ -30,14 +28,12 @@ public class DamengSourceInfoStructMaker
     }
 
     @Override
-    public Schema schema()
-    {
+    public Schema schema() {
         return schema;
     }
 
     @Override
-    public Struct struct(SourceInfo sourceInfo)
-    {
+    public Struct struct(SourceInfo sourceInfo) {
         final String scn = sourceInfo.getScn() == null ? null : sourceInfo.getScn().toString();
         final String commitScn = sourceInfo.getCommitScn() == null ? null : sourceInfo.getCommitScn().toString();
 

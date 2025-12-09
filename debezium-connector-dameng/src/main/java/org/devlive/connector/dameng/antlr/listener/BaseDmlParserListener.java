@@ -24,8 +24,7 @@ import static org.devlive.connector.dameng.antlr.listener.ParserUtils.getTableNa
  * This class contains common methods for DML parser listeners
  */
 abstract class BaseDmlParserListener<T>
-        extends PlSqlParserBaseListener
-{
+        extends PlSqlParserBaseListener {
     protected String catalogName;
     protected String schemaName;
     protected Table table;
@@ -35,8 +34,7 @@ abstract class BaseDmlParserListener<T>
     Map<T, LogMinerColumnValueWrapper> newColumnValues = new LinkedHashMap<>();
     Map<T, LogMinerColumnValueWrapper> oldColumnValues = new LinkedHashMap<>();
 
-    BaseDmlParserListener(String catalogName, String schemaName, OracleDmlParser parser)
-    {
+    BaseDmlParserListener(String catalogName, String schemaName, OracleDmlParser parser) {
         this.parser = parser;
         this.catalogName = catalogName;
         this.schemaName = schemaName;
@@ -51,8 +49,7 @@ abstract class BaseDmlParserListener<T>
      *
      * @param ctx DML table expression context
      */
-    void init(PlSqlParser.Dml_table_expression_clauseContext ctx)
-    {
+    void init(PlSqlParser.Dml_table_expression_clauseContext ctx) {
         String tableName = getTableName(ctx.tableview_name());
         table = parser.databaseTables().forTable(catalogName, schemaName, tableName);
         if (table == null) {

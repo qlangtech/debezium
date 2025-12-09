@@ -26,34 +26,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class OracleDdlParserListener
         extends PlSqlParserBaseListener
-        implements AntlrDdlParserListener
-{
+        implements AntlrDdlParserListener {
     private final List<ParseTreeListener> listeners = new CopyOnWriteArrayList<>();
     private final Collection<ParsingException> errors = new ArrayList<>();
 
     public OracleDdlParserListener(final String catalogName, final String schemaName,
-            final OracleDdlParser parser)
-    {
+                                   final OracleDdlParser parser) {
         listeners.add(new CreateTableParserListener(catalogName, schemaName, parser, listeners));
         listeners.add(new AlterTableParserListener(catalogName, schemaName, parser, listeners));
         listeners.add(new DropTableParserListener(catalogName, schemaName, parser));
     }
 
     @Override
-    public Collection<ParsingException> getErrors()
-    {
+    public Collection<ParsingException> getErrors() {
         return errors;
     }
 
     @Override
-    public void enterEveryRule(ParserRuleContext ctx)
-    {
+    public void enterEveryRule(ParserRuleContext ctx) {
         ProxyParseTreeListenerUtil.delegateEnterRule(ctx, listeners, errors);
     }
 
     @Override
-    public void exitEveryRule(ParserRuleContext ctx)
-    {
+    public void exitEveryRule(ParserRuleContext ctx) {
         ProxyParseTreeListenerUtil.delegateExitRule(ctx, listeners, errors);
     }
 }

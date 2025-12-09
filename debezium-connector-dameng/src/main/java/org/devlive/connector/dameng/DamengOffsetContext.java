@@ -7,7 +7,6 @@ package org.devlive.connector.dameng;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.debezium.connector.SnapshotRecord;
-import io.debezium.connector.oracle.Scn;
 import io.debezium.pipeline.spi.OffsetContext;
 import io.debezium.pipeline.txmetadata.TransactionContext;
 import io.debezium.relational.TableId;
@@ -20,10 +19,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressFBWarnings(value = {"NP_LOAD_OF_KNOWN_NULL_VALUE"})
+@SuppressFBWarnings(value = { "NP_LOAD_OF_KNOWN_NULL_VALUE" })
 public class DamengOffsetContext
-        implements OffsetContext
-{
+        implements OffsetContext {
     private static final String SERVER_PARTITION_KEY = "server";
     private static final String SNAPSHOT_COMPLETED_KEY = "snapshot_completed";
 
@@ -39,15 +37,13 @@ public class DamengOffsetContext
     private boolean snapshotCompleted;
 
     public DamengOffsetContext(DamengConnectorConfig connectorConfig, Scn scn, Scn commitScn,
-                               boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext)
-    {
+                               boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext) {
         this(connectorConfig, scn, snapshot, snapshotCompleted, transactionContext);
         sourceInfo.setCommitScn(commitScn);
     }
 
     private DamengOffsetContext(DamengConnectorConfig connectorConfig, Scn scn,
-            boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext)
-    {
+                                boolean snapshot, boolean snapshotCompleted, TransactionContext transactionContext) {
         partition = Collections.singletonMap(SERVER_PARTITION_KEY, connectorConfig.getLogicalName());
 
         sourceInfo = new SourceInfo(connectorConfig);
@@ -65,8 +61,7 @@ public class DamengOffsetContext
         }
     }
 
-    public static Builder create()
-    {
+    public static Builder create() {
         return new Builder();
     }
 
@@ -77,8 +72,7 @@ public class DamengOffsetContext
      * @param key the entry key, either {@link SourceInfo#SCN_KEY} or {@link SourceInfo#COMMIT_SCN_KEY}.
      * @return the {@link Scn} or null if not found
      */
-    public static Scn getScnFromOffsetMapByKey(Map<String, ?> offset, String key)
-    {
+    public static Scn getScnFromOffsetMapByKey(Map<String, ?> offset, String key) {
         Object scn = offset.get(key);
         if (scn instanceof String) {
             return Scn.valueOf((String) scn);
@@ -89,19 +83,16 @@ public class DamengOffsetContext
         return null;
     }
 
-    public Map<String, ?> getPartition()
-    {
+    public Map<String, ?> getPartition() {
         return partition;
     }
 
-    public MapBackedPartition asPartition()
-    {
+    public MapBackedPartition asPartition() {
         return new MapBackedPartition(partition);
     }
 
     @Override
-    public Map<String, ?> getOffset()
-    {
+    public Map<String, ?> getOffset() {
         if (sourceInfo.isSnapshot()) {
             Map<String, Object> offset = new HashMap<>();
 
@@ -123,80 +114,66 @@ public class DamengOffsetContext
     }
 
     @Override
-    public Schema getSourceInfoSchema()
-    {
+    public Schema getSourceInfoSchema() {
         return sourceInfoSchema;
     }
 
     @Override
-    public Struct getSourceInfo()
-    {
+    public Struct getSourceInfo() {
         return sourceInfo.struct();
     }
 
-    public Scn getScn()
-    {
+    public Scn getScn() {
         return sourceInfo.getScn();
     }
 
-    public void setScn(Scn scn)
-    {
+    public void setScn(Scn scn) {
         sourceInfo.setScn(scn);
     }
 
-    public Scn getCommitScn()
-    {
+    public Scn getCommitScn() {
         return sourceInfo.getCommitScn();
     }
 
-    public void setCommitScn(Scn commitScn)
-    {
+    public void setCommitScn(Scn commitScn) {
         sourceInfo.setCommitScn(commitScn);
     }
 
-    public void setTransactionId(String transactionId)
-    {
+    public void setTransactionId(String transactionId) {
         sourceInfo.setTransactionId(transactionId);
     }
 
-    public void setSourceTime(Instant instant)
-    {
+    public void setSourceTime(Instant instant) {
         sourceInfo.setSourceTime(instant);
     }
 
-    public void setTableId(TableId tableId)
-    {
+    public void setTableId(TableId tableId) {
         sourceInfo.setTableId(tableId);
     }
 
     @Override
-    public boolean isSnapshotRunning()
-    {
+    public boolean isSnapshotRunning() {
         return sourceInfo.isSnapshot() && !snapshotCompleted;
     }
 
     @Override
-    public void preSnapshotStart()
-    {
+    public void preSnapshotStart() {
         sourceInfo.setSnapshot(SnapshotRecord.TRUE);
         snapshotCompleted = false;
     }
 
     @Override
-    public void preSnapshotCompletion()
-    {
+    public void preSnapshotCompletion() {
         snapshotCompleted = true;
     }
 
     @Override
-    public void postSnapshotCompletion()
-    {
+    public void postSnapshotCompletion() {
         sourceInfo.setSnapshot(SnapshotRecord.FALSE);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder("OracleOffsetContext [scn=").append(getScn());
 
         if (sourceInfo.isSnapshot()) {
@@ -210,76 +187,64 @@ public class DamengOffsetContext
     }
 
     @Override
-    public void markLastSnapshotRecord()
-    {
+    public void markLastSnapshotRecord() {
         sourceInfo.setSnapshot(SnapshotRecord.LAST);
     }
 
     @Override
-    public void event(DataCollectionId tableId, Instant timestamp)
-    {
+    public void event(DataCollectionId tableId, Instant timestamp) {
         sourceInfo.setTableId((TableId) tableId);
         sourceInfo.setSourceTime(timestamp);
     }
 
     @Override
-    public TransactionContext getTransactionContext()
-    {
+    public TransactionContext getTransactionContext() {
         return transactionContext;
     }
 
-    public static class Builder
-    {
+    public static class Builder {
         private DamengConnectorConfig connectorConfig;
         private Scn scn;
         private boolean snapshot;
         private boolean snapshotCompleted;
         private TransactionContext transactionContext;
 
-        public Builder logicalName(DamengConnectorConfig connectorConfig)
-        {
+        public Builder logicalName(DamengConnectorConfig connectorConfig) {
             this.connectorConfig = connectorConfig;
             return this;
         }
 
-        public Builder scn(Scn scn)
-        {
+        public Builder scn(Scn scn) {
             this.scn = scn;
             return this;
         }
 
-        public Builder snapshot(boolean snapshot)
-        {
+        public Builder snapshot(boolean snapshot) {
             this.snapshot = snapshot;
             return this;
         }
 
-        public Builder snapshotCompleted(boolean snapshotCompleted)
-        {
+        public Builder snapshotCompleted(boolean snapshotCompleted) {
             this.snapshotCompleted = snapshotCompleted;
             return this;
         }
 
-        public Builder transactionContext(TransactionContext transactionContext)
-        {
+        public Builder transactionContext(TransactionContext transactionContext) {
             this.transactionContext = transactionContext;
             return this;
         }
 
-        DamengOffsetContext build()
-        {
+        DamengOffsetContext build() {
             return new DamengOffsetContext(connectorConfig, scn, snapshot, snapshotCompleted, transactionContext);
         }
     }
 
     public static class Loader
-            implements OffsetContext.Loader<DamengOffsetContext>
-    {
+            implements OffsetContext.Loader<DamengOffsetContext> {
         private final DamengConnectorConfig connectorConfig;
         private final DamengConnectorConfig.ConnectorAdapter adapter;
 
-        public Loader(DamengConnectorConfig connectorConfig, DamengConnectorConfig.ConnectorAdapter adapter)
-        {
+        public Loader(DamengConnectorConfig connectorConfig, DamengConnectorConfig.ConnectorAdapter adapter) {
             this.connectorConfig = connectorConfig;
             this.adapter = adapter;
         }
@@ -287,8 +252,7 @@ public class DamengOffsetContext
         // 构造函数不变
 
         @Override
-        public DamengOffsetContext load(Map<String, ?> offset)
-        {
+        public DamengOffsetContext load(Map<String, ?> offset) {
             boolean snapshot = Boolean.TRUE.equals(offset.get(SourceInfo.SNAPSHOT_KEY));
             boolean snapshotCompleted = Boolean.TRUE.equals(offset.get(SNAPSHOT_COMPLETED_KEY));
             Scn scn;

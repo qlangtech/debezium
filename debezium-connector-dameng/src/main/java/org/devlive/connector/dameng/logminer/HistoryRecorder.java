@@ -8,7 +8,7 @@ package org.devlive.connector.dameng.logminer;
 import io.debezium.common.annotation.Incubating;
 import io.debezium.jdbc.JdbcConfiguration;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 
 import java.sql.Timestamp;
 
@@ -17,8 +17,7 @@ import java.sql.Timestamp;
  */
 @Incubating
 public interface HistoryRecorder
-        extends AutoCloseable
-{
+        extends AutoCloseable {
     /**
      * Prepares the history recorder
      *
@@ -41,7 +40,7 @@ public interface HistoryRecorder
      * @param redoSql the redo SQL that performed the operation
      */
     void record(Scn scn, String tableName, String segOwner, int operationCode, Timestamp changeTime,
-            String transactionId, int csf, String redoSql);
+                String transactionId, int csf, String redoSql);
 
     /**
      * Flushes the LogMiner history captured by the recorder.

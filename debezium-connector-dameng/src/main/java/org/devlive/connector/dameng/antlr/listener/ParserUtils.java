@@ -20,10 +20,9 @@ import java.util.Map;
 /**
  * This class contains a few methods for parser listeners
  */
-public class ParserUtils
-{
-    private ParserUtils()
-    {}
+public class ParserUtils {
+    private ParserUtils() {
+    }
 
     /**
      * This method returns pure column name without quotes
@@ -31,8 +30,7 @@ public class ParserUtils
      * @param ctx column name context
      * @return column name
      */
-    public static String getColumnName(final PlSqlParser.Column_nameContext ctx)
-    {
+    public static String getColumnName(final PlSqlParser.Column_nameContext ctx) {
         return stripeQuotes(ctx.identifier().id_expression().getText());
     }
 
@@ -42,8 +40,7 @@ public class ParserUtils
      * @param text text
      * @return text without surrounding double quotes
      */
-    public static String stripeQuotes(String text)
-    {
+    public static String stripeQuotes(String text) {
         if (text != null && text.indexOf("\"") == 0 && text.lastIndexOf("\"") == text.length() - 1) {
             return text.substring(1, text.length() - 1);
         }
@@ -57,8 +54,7 @@ public class ParserUtils
      * @param alias table alias
      * @return striped string
      */
-    public static String stripeAlias(String text, String alias)
-    {
+    public static String stripeAlias(String text, String alias) {
         int index = text.indexOf(alias + ".");
         if (index >= 0) {
             return text.substring(alias.length() + 1);
@@ -75,8 +71,7 @@ public class ParserUtils
      * @param table Debezium Table object
      */
     public static void cloneOldToNewColumnValues(Map<String, LogMinerColumnValueWrapper> newColumnValues, Map<String, LogMinerColumnValueWrapper> oldColumnValues,
-            Table table)
-    {
+                                                 Table table) {
         for (Column column : table.columns()) {
             final LogMinerColumnValueWrapper newColumnValue = newColumnValues.get(column.name());
             if (!newColumnValue.isProcessed()) {
@@ -96,8 +91,7 @@ public class ParserUtils
      * @return object as the result of this conversion. It could be null if converter cannot build the schema
      * or if converter or value are null
      */
-    public static Object convertValueToSchemaType(Column column, Object value, DamengValueConverters converters)
-    {
+    public static Object convertValueToSchemaType(Column column, Object value, DamengValueConverters converters) {
         if (converters != null && value != null) {
             final SchemaBuilder schemaBuilder = converters.schemaBuilder(column);
             if (schemaBuilder == null) {
@@ -119,8 +113,7 @@ public class ParserUtils
      * @param text supplied value which might be enclosed by apostrophes.
      * @return clean String or null in case if test = "null" or = "NULL"
      */
-    public static String removeApostrophes(String text)
-    {
+    public static String removeApostrophes(String text) {
         if (text != null && text.indexOf("'") == 0 && text.lastIndexOf("'") == text.length() - 1) {
             return text.substring(1, text.length() - 1);
         }
@@ -136,8 +129,7 @@ public class ParserUtils
      * @param text before parsing we replaced it with double escape, now revert it back
      * @return string with double slashes
      */
-    public static String replaceDoubleBackSlashes(String text)
-    {
+    public static String replaceDoubleBackSlashes(String text) {
         if (text != null && text.contains("\\\\")) {
             return text.replaceAll("\\\\\\\\", "\\\\");
         }
@@ -150,8 +142,7 @@ public class ParserUtils
      * @param tableviewNameContext table view context
      * @return table name
      */
-    static String getTableName(final PlSqlParser.Tableview_nameContext tableviewNameContext)
-    {
+    static String getTableName(final PlSqlParser.Tableview_nameContext tableviewNameContext) {
         if (tableviewNameContext.id_expression() != null) {
             return stripeQuotes(tableviewNameContext.id_expression().getText());
         }

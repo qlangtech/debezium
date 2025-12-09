@@ -10,8 +10,7 @@ import java.util.Set;
 /**
  * This interface exposes TransactionalBuffer metrics
  */
-public interface TransactionalBufferMetricsMXBean
-{
+public interface TransactionalBufferMetricsMXBean {
     /**
      * Exposes number of rolled back transactions
      *

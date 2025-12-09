@@ -13,15 +13,12 @@ import io.debezium.DebeziumException;
  * @author Chris Cranford
  */
 public class DmlParserException
-        extends DebeziumException
-{
-    public DmlParserException(String message)
-    {
+        extends DebeziumException {
+    public DmlParserException(String message) {
         super(message);
     }
 
-    public DmlParserException(String message, Throwable t)
-    {
+    public DmlParserException(String message, Throwable t) {
         super(message, t);
     }
 }

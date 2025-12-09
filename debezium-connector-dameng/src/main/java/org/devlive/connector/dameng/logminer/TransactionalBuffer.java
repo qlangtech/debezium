@@ -16,7 +16,7 @@ import org.devlive.connector.dameng.DamengDatabaseSchema;
 import org.devlive.connector.dameng.DamengOffsetContext;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
 import org.devlive.connector.dameng.MapBackedPartition;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 import org.devlive.connector.dameng.logminer.valueholder.LogMinerDmlEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +41,7 @@ import java.util.Set;
  */
 @NotThreadSafe
 public final class TransactionalBuffer
-        implements AutoCloseable
-{
+        implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionalBuffer.class);
 
     private final Map<String, Transaction> transactions;
@@ -62,8 +61,8 @@ public final class TransactionalBuffer
      * @param errorHandler the connector error handler
      * @param streamingMetrics the streaming metrics
      */
-    TransactionalBuffer(DamengDatabaseSchema schema, Clock clock, ErrorHandler errorHandler, DamengStreamingChangeEventSourceMetrics streamingMetrics, long autoCommitTimeoutMs)
-    {
+    TransactionalBuffer(DamengDatabaseSchema schema, Clock clock, ErrorHandler errorHandler, DamengStreamingChangeEventSourceMetrics streamingMetrics,
+                        long autoCommitTimeoutMs) {
         this.transactions = new HashMap<>();
         this.schema = schema;
         this.clock = clock;
@@ -78,8 +77,7 @@ public final class TransactionalBuffer
     /**
      * @return rolled back transactions
      */
-    Set<String> getRolledBackTransactionIds()
-    {
+    Set<String> getRolledBackTransactionIds() {
         return new HashSet<>(rolledBackTransactionIds);
     }
 
@@ -94,8 +92,7 @@ public final class TransactionalBuffer
      * @param changeTime time the DML operation occurred
      * @param rowId unique row identifier
      */
-    void registerDmlOperation(int operation, String transactionId, Scn scn, TableId tableId, LogMinerDmlEntry parseEntry, Instant changeTime, String rowId)
-    {
+    void registerDmlOperation(int operation, String transactionId, Scn scn, TableId tableId, LogMinerDmlEntry parseEntry, Instant changeTime, String rowId) {
         if (abandonedTransactionIds.contains(transactionId)) {
             LogMinerHelper.logWarn(streamingMetrics, "Captured DML for abandoned transaction {}, ignored.", transactionId);
             return;
@@ -123,8 +120,7 @@ public final class TransactionalBuffer
      * @param undoRowId unique row identifier to be undone
      * @param tableId table identifier
      */
-    void undoDmlOperation(String transactionId, String undoRowId, TableId tableId)
-    {
+    void undoDmlOperation(String transactionId, String undoRowId, TableId tableId) {
         Transaction transaction = transactions.get(transactionId);
         if (transaction == null) {
             LOGGER.warn("Cannot undo changes to {} with row id {} as transaction {} not found.", tableId, undoRowId, transactionId);
@@ -154,15 +150,13 @@ public final class TransactionalBuffer
      * @return true if committed transaction is in the buffer, was not processed yet and processed now
      */
     boolean commit(
-            String transactionId,
-            Scn scn,
-            DamengOffsetContext offsetContext,
-            Timestamp timestamp,
-            ChangeEventSource.ChangeEventSourceContext context,
-            String debugMessage,
-            EventDispatcher<MapBackedPartition, TableId> dispatcher
-    )
-    {
+                   String transactionId,
+                   Scn scn,
+                   DamengOffsetContext offsetContext,
+                   Timestamp timestamp,
+                   ChangeEventSource.ChangeEventSourceContext context,
+                   String debugMessage,
+                   EventDispatcher<MapBackedPartition, TableId> dispatcher) {
         Instant start = Instant.now();
         Transaction transaction = transactions.remove(transactionId);
         if (transaction == null) {
@@ -188,16 +182,14 @@ public final class TransactionalBuffer
     }
 
     private void commit(
-            ChangeEventSource.ChangeEventSourceContext context,
-            DamengOffsetContext offsetContext,
-            Instant start,
-            Transaction transaction,
-            Timestamp timestamp,
-            Scn smallestScn,
-            Scn scn,
-            EventDispatcher<MapBackedPartition, TableId> dispatcher
-    )
-    {
+                        ChangeEventSource.ChangeEventSourceContext context,
+                        DamengOffsetContext offsetContext,
+                        Instant start,
+                        Transaction transaction,
+                        Timestamp timestamp,
+                        Scn smallestScn,
+                        Scn scn,
+                        EventDispatcher<MapBackedPartition, TableId> dispatcher) {
         try {
             int counter = transaction.events.size();
             for (DmlEvent event : transaction.events) {
@@ -230,9 +222,7 @@ public final class TransactionalBuffer
                                 offsetContext,
                                 event.getEntry(),
                                 schema.tableFor(event.getTableId()),
-                                clock
-                        )
-                );
+                                clock));
             }
 
             lastCommittedScn = Scn.valueOf(scn.longValue());
@@ -267,11 +257,9 @@ public final class TransactionalBuffer
      * 这样，即使LogMiner没有捕获到COMMIT事件，操作也能被正确处理和提交。
      */
     void checkAndAutoCommitTransactions(
-            DamengOffsetContext offsetContext,
-            ChangeEventSource.ChangeEventSourceContext context,
-            EventDispatcher<MapBackedPartition, TableId> dispatcher
-    )
-    {
+                                        DamengOffsetContext offsetContext,
+                                        ChangeEventSource.ChangeEventSourceContext context,
+                                        EventDispatcher<MapBackedPartition, TableId> dispatcher) {
         Instant now = Instant.now();
         Set<String> transactionsToCommit = new HashSet<>();
 
@@ -301,8 +289,7 @@ public final class TransactionalBuffer
      * @param debugMessage message
      * @return true if the rollback is for a transaction in the buffer
      */
-    boolean rollback(String transactionId, String debugMessage)
-    {
+    boolean rollback(String transactionId, String debugMessage) {
         Transaction transaction = transactions.get(transactionId);
         if (transaction != null) {
             LOGGER.debug("Transaction rolled back: {}", debugMessage);
@@ -329,8 +316,7 @@ public final class TransactionalBuffer
      * @param thresholdScn the smallest SVN of any transaction to keep in the buffer. All others will be removed.
      * @param offsetContext the offset context
      */
-    void abandonLongTransactions(Scn thresholdScn, DamengOffsetContext offsetContext)
-    {
+    void abandonLongTransactions(Scn thresholdScn, DamengOffsetContext offsetContext) {
         LogMinerHelper.logWarn(streamingMetrics, "All transactions with first SCN <= {} will be abandoned, offset: {}", thresholdScn, offsetContext.getScn());
         Scn threshold = Scn.valueOf(thresholdScn.toString());
         Scn smallestScn = calculateSmallestScn();
@@ -356,19 +342,17 @@ public final class TransactionalBuffer
         }
     }
 
-    boolean isTransactionRegistered(String txId)
-    {
+    boolean isTransactionRegistered(String txId) {
         return transactions.get(txId) != null;
     }
 
-    private Scn calculateSmallestScn()
-    {
+    private Scn calculateSmallestScn() {
         Scn scn = transactions.isEmpty() ? null
                 : transactions.values()
-                .stream()
-                .map(transaction -> transaction.firstScn)
-                .min(Scn::compareTo)
-                .orElseThrow(() -> new DataException("Cannot calculate smallest SCN"));
+                        .stream()
+                        .map(transaction -> transaction.firstScn)
+                        .min(Scn::compareTo)
+                        .orElseThrow(() -> new DataException("Cannot calculate smallest SCN"));
         streamingMetrics.setOldestScn(scn == null ? Scn.valueOf(-1) : scn);
         return scn;
     }
@@ -378,22 +362,19 @@ public final class TransactionalBuffer
      *
      * @return {@code true} if buffer is empty, otherwise {@code false}
      */
-    boolean isEmpty()
-    {
+    boolean isEmpty() {
         return transactions.isEmpty();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder result = new StringBuilder();
         this.transactions.values().forEach(t -> result.append(t.toString()));
         return result.toString();
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         transactions.clear();
 
         if (this.streamingMetrics != null) {
@@ -404,16 +385,14 @@ public final class TransactionalBuffer
     /**
      * Represents a logical database transaction
      */
-    private static final class Transaction
-    {
+    private static final class Transaction {
         private final String transactionId;
         private final Scn firstScn;
         private final List<DmlEvent> events;
         private final Scn lastScn;
         private Instant lastUpdateTime;
 
-        private Transaction(String transactionId, Scn firstScn)
-        {
+        private Transaction(String transactionId, Scn firstScn) {
             this.transactionId = transactionId;
             this.firstScn = firstScn;
             this.events = new ArrayList<>();
@@ -422,8 +401,7 @@ public final class TransactionalBuffer
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "Transaction{" +
                     "transactionId=" + transactionId +
                     ", firstScn=" + firstScn +
@@ -436,16 +414,14 @@ public final class TransactionalBuffer
     /**
      * Represents a DML event for a given table row.
      */
-    private static class DmlEvent
-    {
+    private static class DmlEvent {
         private final int operation;
         private final LogMinerDmlEntry entry;
         private final Scn scn;
         private final TableId tableId;
         private final String rowId;
 
-        public DmlEvent(int operation, LogMinerDmlEntry entry, Scn scn, TableId tableId, String rowId)
-        {
+        public DmlEvent(int operation, LogMinerDmlEntry entry, Scn scn, TableId tableId, String rowId) {
             this.operation = operation;
             this.scn = scn;
             this.tableId = tableId;
@@ -453,34 +429,28 @@ public final class TransactionalBuffer
             this.entry = entry;
         }
 
-        public int getOperation()
-        {
+        public int getOperation() {
             return operation;
         }
 
-        public LogMinerDmlEntry getEntry()
-        {
+        public LogMinerDmlEntry getEntry() {
             return entry;
         }
 
-        public Scn getScn()
-        {
+        public Scn getScn() {
             return scn;
         }
 
-        public TableId getTableId()
-        {
+        public TableId getTableId() {
             return tableId;
         }
 
-        public String getRowId()
-        {
+        public String getRowId() {
             return rowId;
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
@@ -496,8 +466,7 @@ public final class TransactionalBuffer
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return Objects.hash(operation, entry, scn, tableId, rowId);
         }
     }

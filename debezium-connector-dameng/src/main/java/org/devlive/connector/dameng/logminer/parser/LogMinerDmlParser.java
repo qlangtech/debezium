@@ -49,8 +49,7 @@ import java.util.Map;
  * @author Chris Cranford
  */
 public class LogMinerDmlParser
-        implements DmlParser
-{
+        implements DmlParser {
     private static final String SINGLE_QUOTE = "'";
     private static final String NULL = "NULL";
     private static final String INSERT_INTO = "insert into ";
@@ -73,8 +72,7 @@ public class LogMinerDmlParser
     private static final int SET_LENGTH = SET.length();
     private static final int WHERE_LENGTH = WHERE.length();
 
-    private static <K, V> Map<K, V> createMap(List<K> keys, List<V> values)
-    {
+    private static <K, V> Map<K, V> createMap(List<K> keys, List<V> values) {
         Map<K, V> result = new LinkedHashMap<>(keys.size());
         for (int i = 0; i < keys.size(); ++i) {
             result.put(keys.get(i), values.get(i));
@@ -88,8 +86,7 @@ public class LogMinerDmlParser
      * @param text the text to remove single quotes
      * @return the text with single quotes removed
      */
-    private static String removeSingleQuotes(String text)
-    {
+    private static String removeSingleQuotes(String text) {
         if (text.startsWith(SINGLE_QUOTE) && text.endsWith(SINGLE_QUOTE)) {
             return text.substring(1, text.length() - 1);
         }
@@ -103,8 +100,7 @@ public class LogMinerDmlParser
      * @param columnValue the column value
      * @return the LogMiner column value object
      */
-    private static LogMinerColumnValue createColumnValue(String columnName, String columnValue)
-    {
+    private static LogMinerColumnValue createColumnValue(String columnName, String columnValue) {
         LogMinerColumnValue value = new LogMinerColumnValueImpl(columnName, 0);
         if (columnValue != null && !columnValue.equals(NULL)) {
             value.setColumnData(columnValue);
@@ -113,8 +109,7 @@ public class LogMinerDmlParser
     }
 
     @Override
-    public LogMinerDmlEntry parse(String sql, Table table, String txId)
-    {
+    public LogMinerDmlEntry parse(String sql, Table table, String txId) {
         if (table == null) {
             throw new DmlParserException("DML parser requires a non-null table");
         }
@@ -139,8 +134,7 @@ public class LogMinerDmlParser
      * @param table the table
      * @return the parsed DML entry record or {@code null} if the SQL was not parsed
      */
-    private LogMinerDmlEntry parseInsert(String sql, Table table)
-    {
+    private LogMinerDmlEntry parseInsert(String sql, Table table) {
         try {
             // advance beyond "insert into "
             int index = INSERT_INTO_LENGTH;
@@ -183,8 +177,7 @@ public class LogMinerDmlParser
      * @param table the table
      * @return the parsed DML entry record or {@code null} if the SQL was not parsed
      */
-    private LogMinerDmlEntry parseUpdate(String sql, Table table)
-    {
+    private LogMinerDmlEntry parseUpdate(String sql, Table table) {
         try {
             // advance beyond "update "
             int index = UPDATE_LENGTH;
@@ -255,8 +248,7 @@ public class LogMinerDmlParser
      * @param table the table
      * @return the parsed DML entry record or {@code null} if the SQL was not parsed
      */
-    private LogMinerDmlEntry parseDelete(String sql, Table table)
-    {
+    private LogMinerDmlEntry parseDelete(String sql, Table table) {
         try {
             // advance beyond "delete from "
             int index = DELETE_FROM_LENGTH;
@@ -298,8 +290,7 @@ public class LogMinerDmlParser
      * @param index the index into the sql statement to begin parsing
      * @return the index into the sql string where the table name ended
      */
-    private int parseTableName(String sql, int index)
-    {
+    private int parseTableName(String sql, int index) {
         boolean inQuote = false;
 
         for (; index < sql.length(); ++index) {
@@ -327,8 +318,7 @@ public class LogMinerDmlParser
      * @param columnNames the list that will be populated with the column names
      * @return the index into the sql string where the column-list clause ended
      */
-    private int parseColumnListClause(String sql, int start, List<String> columnNames)
-    {
+    private int parseColumnListClause(String sql, int start, List<String> columnNames) {
         int index = start;
         boolean inQuote = false;
         for (; index < sql.length(); ++index) {
@@ -367,8 +357,7 @@ public class LogMinerDmlParser
      * @param columnValues the list of that will populated with the column values
      * @return the index into the sql string where the column-values clause ended
      */
-    private int parseColumnValuesClause(String sql, int start, List<String> columnValues)
-    {
+    private int parseColumnValuesClause(String sql, int start, List<String> columnValues) {
         int index = start;
         int nested = 0;
         boolean inQuote = false;
@@ -427,8 +416,7 @@ public class LogMinerDmlParser
      * @param columnValues the list of the changed column values that will be populated
      * @return the index into the sql string where the set-clause ended
      */
-    private int parseSetClause(String sql, int start, List<String> columnNames, List<String> columnValues)
-    {
+    private int parseSetClause(String sql, int start, List<String> columnNames, List<String> columnValues) {
         boolean inDoubleQuote = false;
         boolean inSingleQuote = false;
         boolean inColumnName = true;
@@ -545,8 +533,7 @@ public class LogMinerDmlParser
      * @param columnValues the column values parsed from the clause
      * @return the index into the sql string to continue parsing
      */
-    private int parseWhereClause(String sql, int start, List<String> columnNames, List<String> columnValues)
-    {
+    private int parseWhereClause(String sql, int start, List<String> columnNames, List<String> columnValues) {
         int nested = 0;
         boolean inColumnName = true;
         boolean inColumnValue = false;

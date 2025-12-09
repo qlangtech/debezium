@@ -7,15 +7,13 @@ package org.devlive.connector.dameng;
 
 import io.debezium.annotation.NotThreadSafe;
 import io.debezium.connector.common.BaseSourceInfo;
-import io.debezium.connector.oracle.Scn;
 import io.debezium.relational.TableId;
 
 import java.time.Instant;
 
 @NotThreadSafe
 public class SourceInfo
-        extends BaseSourceInfo
-{
+        extends BaseSourceInfo {
     public static final String TXID_KEY = "txId";
     public static final String SCN_KEY = "scn";
     public static final String COMMIT_SCN_KEY = "commit_scn";
@@ -28,70 +26,57 @@ public class SourceInfo
     private Instant sourceTime;
     private TableId tableId;
 
-    protected SourceInfo(DamengConnectorConfig connectorConfig)
-    {
+    protected SourceInfo(DamengConnectorConfig connectorConfig) {
         super(connectorConfig);
     }
 
-    public Scn getScn()
-    {
+    public Scn getScn() {
         return scn;
     }
 
-    public void setScn(Scn scn)
-    {
+    public void setScn(Scn scn) {
         this.scn = scn;
     }
 
-    public Scn getCommitScn()
-    {
+    public Scn getCommitScn() {
         return commitScn;
     }
 
-    public void setCommitScn(Scn commitScn)
-    {
+    public void setCommitScn(Scn commitScn) {
         this.commitScn = commitScn;
     }
 
-    public String getTransactionId()
-    {
+    public String getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId)
-    {
+    public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
 
-    public Instant getSourceTime()
-    {
+    public Instant getSourceTime() {
         return sourceTime;
     }
 
-    public void setSourceTime(Instant sourceTime)
-    {
+    public void setSourceTime(Instant sourceTime) {
         this.sourceTime = sourceTime;
     }
 
-    public TableId getTableId()
-    {
+    public TableId getTableId() {
         return tableId;
     }
 
-    public void setTableId(TableId tableId)
-    {
+    public void setTableId(TableId tableId) {
         this.tableId = tableId;
     }
 
     @Override
-    protected Instant timestamp()
-    {
+    protected Instant timestamp() {
         return sourceTime;
     }
 
     @Override
-    protected String database()
-    {
+    protected String database() {
         return tableId.catalog();
     }
 }

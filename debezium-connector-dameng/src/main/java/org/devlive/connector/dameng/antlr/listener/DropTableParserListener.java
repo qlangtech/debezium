@@ -16,22 +16,19 @@ import static org.devlive.connector.dameng.antlr.listener.ParserUtils.getTableNa
  * This class is parsing Oracle drop table statements.
  */
 public class DropTableParserListener
-        extends PlSqlParserBaseListener
-{
+        extends PlSqlParserBaseListener {
     private final String catalogName;
     private final String schemaName;
     private final OracleDdlParser parser;
 
-    DropTableParserListener(final String catalogName, final String schemaName, final OracleDdlParser parser)
-    {
+    DropTableParserListener(final String catalogName, final String schemaName, final OracleDdlParser parser) {
         this.catalogName = catalogName;
         this.schemaName = schemaName;
         this.parser = parser;
     }
 
     @Override
-    public void enterDrop_table(final PlSqlParser.Drop_tableContext ctx)
-    {
+    public void enterDrop_table(final PlSqlParser.Drop_tableContext ctx) {
         TableId tableId = new TableId(catalogName, schemaName, getTableName(ctx.tableview_name().get(0)));
         parser.databaseTables().removeTable(tableId);
         super.enterDrop_table(ctx);

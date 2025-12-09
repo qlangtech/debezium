@@ -8,7 +8,7 @@ package org.devlive.connector.dameng.logminer;
 import io.debezium.annotation.ThreadSafe;
 import io.debezium.connector.common.CdcSourceTaskContext;
 import io.debezium.metrics.Metrics;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,8 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @ThreadSafe
 public class TransactionalBufferMetrics
         extends Metrics
-        implements TransactionalBufferMetricsMXBean
-{
+        implements TransactionalBufferMetricsMXBean {
     private static final long MILLIS_PER_SECOND = 1000L;
 
     private final AtomicReference<Scn> oldestScn = new AtomicReference<>();
@@ -49,8 +48,7 @@ public class TransactionalBufferMetrics
     private final AtomicInteger warningCounter = new AtomicInteger();
     private final AtomicInteger scnFreezeCounter = new AtomicInteger();
 
-    TransactionalBufferMetrics(CdcSourceTaskContext taskContext)
-    {
+    TransactionalBufferMetrics(CdcSourceTaskContext taskContext) {
         super(taskContext, "log-miner-transactional-buffer");
         startTime = Instant.now();
         oldestScn.set(Scn.NULL);
@@ -60,13 +58,11 @@ public class TransactionalBufferMetrics
         reset();
     }
 
-    public void setTimeDifference(AtomicLong timeDifference)
-    {
+    public void setTimeDifference(AtomicLong timeDifference) {
         this.timeDifference.set(timeDifference.get());
     }
 
-    void calculateLagMetrics(Instant changeTime)
-    {
+    void calculateLagMetrics(Instant changeTime) {
         if (changeTime != null) {
             Instant correctedChangeTime = changeTime.plus(Duration.ofMillis(timeDifference.longValue()));
             lagFromTheSource.set(Duration.between(correctedChangeTime, Instant.now()).abs());
@@ -80,42 +76,35 @@ public class TransactionalBufferMetrics
         }
     }
 
-    void setActiveTransactions(Integer counter)
-    {
+    void setActiveTransactions(Integer counter) {
         if (counter != null) {
             activeTransactions.set(counter);
         }
     }
 
-    void incrementRolledBackTransactions()
-    {
+    void incrementRolledBackTransactions() {
         rolledBackTransactions.incrementAndGet();
     }
 
-    void incrementCommittedTransactions()
-    {
+    void incrementCommittedTransactions() {
         committedTransactions.incrementAndGet();
     }
 
-    void incrementRegisteredDmlCounter()
-    {
+    void incrementRegisteredDmlCounter() {
         registeredDmlCounter.incrementAndGet();
     }
 
-    void incrementCommittedDmlCounter(int counter)
-    {
+    void incrementCommittedDmlCounter(int counter) {
         committedDmlCounter.getAndAdd(counter);
     }
 
-    void addAbandonedTransactionId(String transactionId)
-    {
+    void addAbandonedTransactionId(String transactionId) {
         if (transactionId != null) {
             abandonedTransactionIds.get().add(transactionId);
         }
     }
 
-    void addRolledBackTransactionId(String transactionId)
-    {
+    void addRolledBackTransactionId(String transactionId) {
         if (transactionId != null) {
             rolledBackTransactionIds.get().add(transactionId);
         }
@@ -125,8 +114,7 @@ public class TransactionalBufferMetrics
      * This is to increase logged logError counter.
      * There are other ways to monitor the log, but this is just to check if there are any.
      */
-    void incrementErrorCounter()
-    {
+    void incrementErrorCounter() {
         errorCounter.incrementAndGet();
     }
 
@@ -134,8 +122,7 @@ public class TransactionalBufferMetrics
      * This is to increase logged warning counter
      * There are other ways to monitor the log, but this is just to check if there are any.
      */
-    void incrementWarningCounter()
-    {
+    void incrementWarningCounter() {
         warningCounter.incrementAndGet();
     }
 
@@ -143,146 +130,122 @@ public class TransactionalBufferMetrics
      * This counter to accumulate number of encountered observations when SCN does not change in the offset.
      * This call indicates an uncommitted oldest transaction in the buffer.
      */
-    void incrementScnFreezeCounter()
-    {
+    void incrementScnFreezeCounter() {
         scnFreezeCounter.incrementAndGet();
     }
 
     // implemented getters
     @Override
-    public Long getOldestScn()
-    {
+    public Long getOldestScn() {
         return oldestScn.get().longValue();
     }
 
     // setters
-    void setOldestScn(Scn scn)
-    {
+    void setOldestScn(Scn scn) {
         oldestScn.set(scn);
     }
 
     @Override
-    public Long getCommittedScn()
-    {
+    public Long getCommittedScn() {
         return committedScn.get().longValue();
     }
 
-    public void setCommittedScn(Scn scn)
-    {
+    public void setCommittedScn(Scn scn) {
         committedScn.set(scn);
     }
 
     @Override
-    public Long getOffsetScn()
-    {
+    public Long getOffsetScn() {
         return offsetScn.get().longValue();
     }
 
-    public void setOffsetScn(Scn scn)
-    {
+    public void setOffsetScn(Scn scn) {
         offsetScn.set(scn);
     }
 
     @Override
-    public int getNumberOfActiveTransactions()
-    {
+    public int getNumberOfActiveTransactions() {
         return activeTransactions.get();
     }
 
     @Override
-    public long getNumberOfRolledBackTransactions()
-    {
+    public long getNumberOfRolledBackTransactions() {
         return rolledBackTransactions.get();
     }
 
     @Override
-    public long getNumberOfCommittedTransactions()
-    {
+    public long getNumberOfCommittedTransactions() {
         return committedTransactions.get();
     }
 
     @Override
-    public long getCommitThroughput()
-    {
+    public long getCommitThroughput() {
         long timeSpent = Duration.between(startTime, Instant.now()).toMillis();
         return committedTransactions.get() * MILLIS_PER_SECOND / (timeSpent != 0 ? timeSpent : 1);
     }
 
     @Override
-    public long getRegisteredDmlCount()
-    {
+    public long getRegisteredDmlCount() {
         return registeredDmlCounter.longValue();
     }
 
     @Override
-    public long getLagFromSource()
-    {
+    public long getLagFromSource() {
         return lagFromTheSource.get().toMillis();
     }
 
     @Override
-    public long getMaxLagFromSource()
-    {
+    public long getMaxLagFromSource() {
         return maxLagFromTheSource.get().toMillis();
     }
 
     @Override
-    public long getMinLagFromSource()
-    {
+    public long getMinLagFromSource() {
         return minLagFromTheSource.get().toMillis();
     }
 
     @Override
-    public Set<String> getAbandonedTransactionIds()
-    {
+    public Set<String> getAbandonedTransactionIds() {
         return abandonedTransactionIds.get();
     }
 
     @Override
-    public Set<String> getRolledBackTransactionIds()
-    {
+    public Set<String> getRolledBackTransactionIds() {
         return rolledBackTransactionIds.get();
     }
 
     @Override
-    public int getErrorCounter()
-    {
+    public int getErrorCounter() {
         return errorCounter.get();
     }
 
     @Override
-    public int getWarningCounter()
-    {
+    public int getWarningCounter() {
         return warningCounter.get();
     }
 
     @Override
-    public int getScnFreezeCounter()
-    {
+    public int getScnFreezeCounter() {
         return scnFreezeCounter.get();
     }
 
-    public Long getLastCommitDuration()
-    {
+    public Long getLastCommitDuration() {
         return lastCommitDuration.get();
     }
 
-    void setLastCommitDuration(Long lastDuration)
-    {
+    void setLastCommitDuration(Long lastDuration) {
         lastCommitDuration.set(lastDuration);
         if (lastDuration > maxCommitDuration.get()) {
             maxCommitDuration.set(lastDuration);
         }
     }
 
-    public Long getMaxCommitDuration()
-    {
+    public Long getMaxCommitDuration() {
         return maxCommitDuration.get();
     }
 
     @Override
-    public void reset()
-    {
+    public void reset() {
         maxLagFromTheSource.set(Duration.ZERO);
         minLagFromTheSource.set(Duration.ZERO);
         activeTransactions.set(0);
@@ -299,8 +262,7 @@ public class TransactionalBufferMetrics
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "TransactionalBufferMetrics{" +
                 "oldestScn=" + oldestScn.get() +
                 ", committedScn=" + committedScn.get() +

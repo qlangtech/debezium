@@ -34,30 +34,25 @@ import static io.debezium.antlr.AntlrDdlParser.getText;
  * and "COL7" IS NULL and "COL8" IS NULL
  */
 public class InsertParserListener
-        extends BaseDmlParserListener<Integer>
-{
-    InsertParserListener(String catalogName, String schemaName, OracleDmlParser parser)
-    {
+        extends BaseDmlParserListener<Integer> {
+    InsertParserListener(String catalogName, String schemaName, OracleDmlParser parser) {
         super(catalogName, schemaName, parser);
     }
 
     @Override
-    protected Integer getKey(Column column, int index)
-    {
+    protected Integer getKey(Column column, int index) {
         return index;
     }
 
     @Override
-    public void enterInsert_statement(PlSqlParser.Insert_statementContext ctx)
-    {
+    public void enterInsert_statement(PlSqlParser.Insert_statementContext ctx) {
         init(ctx.single_table_insert().insert_into_clause().general_table_ref().dml_table_expression_clause());
         oldColumnValues.clear();
         super.enterInsert_statement(ctx);
     }
 
     @Override
-    public void enterValues_clause(PlSqlParser.Values_clauseContext ctx)
-    {
+    public void enterValues_clause(PlSqlParser.Values_clauseContext ctx) {
         if (table == null) {
             throw new ParsingException(null, "Trying to parse a statement for a table which does not exist. " +
                     "Statement: " + getText(ctx));
@@ -81,8 +76,7 @@ public class InsertParserListener
     }
 
     @Override
-    public void exitSingle_table_insert(PlSqlParser.Single_table_insertContext ctx)
-    {
+    public void exitSingle_table_insert(PlSqlParser.Single_table_insertContext ctx) {
         List<LogMinerColumnValue> actualNewValues = newColumnValues.values()
                 .stream().map(LogMinerColumnValueWrapper::getColumnValue).collect(Collectors.toList());
         LogMinerDmlEntry newRecord = new LogMinerDmlEntryImpl(Envelope.Operation.CREATE, actualNewValues, Collections.emptyList());

@@ -23,8 +23,7 @@ import static io.debezium.antlr.AntlrDdlParser.getText;
  * Parser listener that is parsing Oracle ALTER TABLE statements
  */
 public class AlterTableParserListener
-        extends BaseParserListener
-{
+        extends BaseParserListener {
     private static final int STARTING_INDEX = 1;
     private final List<ParseTreeListener> listeners;
     private final String catalogName;
@@ -44,8 +43,7 @@ public class AlterTableParserListener
      * @param listeners registered listeners
      */
     AlterTableParserListener(final String catalogName, final String schemaName, final OracleDdlParser parser,
-            final List<ParseTreeListener> listeners)
-    {
+                             final List<ParseTreeListener> listeners) {
         this.catalogName = catalogName;
         this.schemaName = schemaName;
         this.parser = parser;
@@ -53,8 +51,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void enterAlter_table(PlSqlParser.Alter_tableContext ctx)
-    {
+    public void enterAlter_table(PlSqlParser.Alter_tableContext ctx) {
         TableId tableId = new TableId(catalogName, schemaName, getTableName(ctx.tableview_name()));
         // todo filter tables not in table.include.list
         tableEditor = parser.databaseTables().editTable(tableId);
@@ -66,8 +63,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void exitAlter_table(PlSqlParser.Alter_tableContext ctx)
-    {
+    public void exitAlter_table(PlSqlParser.Alter_tableContext ctx) {
         parser.runIfNotNull(() -> {
             listeners.remove(columnDefinitionParserListener);
             parser.databaseTables().overwriteTable(tableEditor.create());
@@ -77,8 +73,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void enterAdd_column_clause(PlSqlParser.Add_column_clauseContext ctx)
-    {
+    public void enterAdd_column_clause(PlSqlParser.Add_column_clauseContext ctx) {
         parser.runIfNotNull(() -> {
             List<PlSqlParser.Column_definitionContext> columns = ctx.column_definition();
             columnEditors = new ArrayList<>(columns.size());
@@ -94,8 +89,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void exitAdd_column_clause(PlSqlParser.Add_column_clauseContext ctx)
-    {
+    public void exitAdd_column_clause(PlSqlParser.Add_column_clauseContext ctx) {
         parser.runIfNotNull(() -> {
             columnEditors.forEach(columnEditor -> tableEditor.addColumn(columnEditor.create()));
             listeners.remove(columnDefinitionParserListener);
@@ -105,8 +99,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void exitColumn_definition(PlSqlParser.Column_definitionContext ctx)
-    {
+    public void exitColumn_definition(PlSqlParser.Column_definitionContext ctx) {
         parser.runIfNotNull(() -> {
             if (columnEditors != null) {
                 // column editor list is not null when a multiple columns are parsed in one statement
@@ -127,8 +120,7 @@ public class AlterTableParserListener
     }
 
     @Override
-    public void enterDrop_column_clause(PlSqlParser.Drop_column_clauseContext ctx)
-    {
+    public void enterDrop_column_clause(PlSqlParser.Drop_column_clauseContext ctx) {
         parser.runIfNotNull(() -> {
             List<PlSqlParser.Column_nameContext> columnNameContexts = ctx.column_name();
             columnEditors = new ArrayList<>(columnNameContexts.size());

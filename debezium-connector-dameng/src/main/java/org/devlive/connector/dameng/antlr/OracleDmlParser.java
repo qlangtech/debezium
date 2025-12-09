@@ -23,36 +23,31 @@ import org.devlive.connector.dameng.logminer.valueholder.LogMinerDmlEntry;
 /**
  * This is the main Oracle Antlr DML parser
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "EI_EXPOSE_REP"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2", "EI_EXPOSE_REP" })
 public class OracleDmlParser
-        extends AntlrDdlParser<PlSqlLexer, PlSqlParser>
-{
+        extends AntlrDdlParser<PlSqlLexer, PlSqlParser> {
     protected final String catalogName;
     protected final String schemaName;
     private final DamengValueConverters converter;
     private LogMinerDmlEntry dmlEntry;
 
-    public OracleDmlParser(boolean throwErrorsFromTreeWalk, final String catalogName, final String schemaName, DamengValueConverters converter)
-    {
+    public OracleDmlParser(boolean throwErrorsFromTreeWalk, final String catalogName, final String schemaName, DamengValueConverters converter) {
         super(throwErrorsFromTreeWalk);
         this.catalogName = catalogName;
         this.schemaName = schemaName;
         this.converter = converter;
     }
 
-    public LogMinerDmlEntry getDmlEntry()
-    {
+    public LogMinerDmlEntry getDmlEntry() {
         return dmlEntry;
     }
 
-    public void setDmlEntry(LogMinerDmlEntry dml)
-    {
+    public void setDmlEntry(LogMinerDmlEntry dml) {
         this.dmlEntry = dml;
     }
 
     @Override
-    public void parse(String dmlContent, Tables databaseTables)
-    {
+    public void parse(String dmlContent, Tables databaseTables) {
         if (!dmlContent.endsWith(";")) {
             dmlContent = dmlContent + ";";
         }
@@ -61,49 +56,41 @@ public class OracleDmlParser
     }
 
     @Override
-    public ParseTree parseTree(PlSqlParser parser)
-    {
+    public ParseTree parseTree(PlSqlParser parser) {
         return parser.unit_statement();
     }
 
     @Override
-    protected AntlrDdlParserListener createParseTreeWalkerListener()
-    {
+    protected AntlrDdlParserListener createParseTreeWalkerListener() {
         return new OracleDmlParserListener(catalogName, schemaName, this);
     }
 
     @Override
-    protected PlSqlLexer createNewLexerInstance(CharStream charStreams)
-    {
+    protected PlSqlLexer createNewLexerInstance(CharStream charStreams) {
         return new PlSqlLexer(charStreams);
     }
 
     @Override
-    protected PlSqlParser createNewParserInstance(CommonTokenStream commonTokenStream)
-    {
+    protected PlSqlParser createNewParserInstance(CommonTokenStream commonTokenStream) {
         return new PlSqlParser(commonTokenStream);
     }
 
     @Override
-    protected boolean isGrammarInUpperCase()
-    {
+    protected boolean isGrammarInUpperCase() {
         return true;
     }
 
     @Override
-    protected DataTypeResolver initializeDataTypeResolver()
-    {
+    protected DataTypeResolver initializeDataTypeResolver() {
         return null;
     }
 
     @Override
-    protected SystemVariables createNewSystemVariablesInstance()
-    {
+    protected SystemVariables createNewSystemVariablesInstance() {
         return null;
     }
 
-    public DamengValueConverters getConverters()
-    {
+    public DamengValueConverters getConverters() {
         return converter;
     }
 }

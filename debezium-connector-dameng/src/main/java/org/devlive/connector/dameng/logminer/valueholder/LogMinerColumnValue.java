@@ -5,8 +5,7 @@
  */
 package org.devlive.connector.dameng.logminer.valueholder;
 
-public interface LogMinerColumnValue
-{
+public interface LogMinerColumnValue {
     /**
      * @return value of the database record
      * with exception of LOB types

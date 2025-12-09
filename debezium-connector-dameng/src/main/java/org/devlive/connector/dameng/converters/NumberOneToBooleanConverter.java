@@ -24,16 +24,14 @@ import java.util.function.Predicate;
  * @author Chris Cranford
  */
 public class NumberOneToBooleanConverter
-        implements CustomConverter<SchemaBuilder, RelationalColumn>
-{
+        implements CustomConverter<SchemaBuilder, RelationalColumn> {
     public static final String SELECTOR_PROPERTY = "selector";
     private static final Logger LOGGER = LoggerFactory.getLogger(NumberOneToBooleanConverter.class);
     private static final Boolean FALLBACK = Boolean.FALSE;
     private Predicate<RelationalColumn> selector = x -> true;
 
     @Override
-    public void configure(Properties props)
-    {
+    public void configure(Properties props) {
         final String selectorConfig = props.getProperty(SELECTOR_PROPERTY);
         if (Strings.isNullOrEmpty(selectorConfig)) {
             return;
@@ -42,8 +40,7 @@ public class NumberOneToBooleanConverter
     }
 
     @Override
-    public void converterFor(RelationalColumn field, ConverterRegistration<SchemaBuilder> registration)
-    {
+    public void converterFor(RelationalColumn field, ConverterRegistration<SchemaBuilder> registration) {
         if (!"NUMBER".equalsIgnoreCase(field.typeName()) || field.length().orElse(-1) != 1 || !selector.test(field)) {
             return;
         }

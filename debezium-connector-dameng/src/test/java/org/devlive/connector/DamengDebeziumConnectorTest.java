@@ -16,13 +16,11 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DamengDebeziumConnectorTest
-{
+public class DamengDebeziumConnectorTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DamengDebeziumConnectorTest.class);
     private static DebeziumEngine<ChangeEvent<String, String>> engine;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         Properties props = new Properties();
         props.setProperty("name", "dameng-engine-localhost");
         props.setProperty("connector.class", DamengConnector.class.getName());
@@ -54,12 +52,12 @@ public class DamengDebeziumConnectorTest
         props.setProperty("debezium.source.poll.interval.ms", "1000");
 
         // 事务处理配置
-//        props.setProperty("debezium.source.transaction.recover.policy", "skip"); // 或尝试 "skip"
-//        props.setProperty("debezium.source.max.queue.size", "8192"); // 增加队列大小
-//        props.setProperty("debezium.source.max.batch.size", "2048"); // 增加批处理大小
+        // props.setProperty("debezium.source.transaction.recover.policy", "skip"); // 或尝试 "skip"
+        // props.setProperty("debezium.source.max.queue.size", "8192"); // 增加队列大小
+        // props.setProperty("debezium.source.max.batch.size", "2048"); // 增加批处理大小
 
         // 暂时不能使用 "fast" 会导致部分字段解析失败
-//        props.setProperty("internal.log.mining.dml.parser", "legacy");
+        // props.setProperty("internal.log.mining.dml.parser", "legacy");
 
         // 自动提交未提交事务的时间（以毫秒为单位）。
         props.setProperty("debezium.source.transaction.auto.commit.timeout.ms", "2000");
@@ -79,8 +77,7 @@ public class DamengDebeziumConnectorTest
         executor.execute(engine);
     }
 
-    private static void closeEngine(DebeziumEngine<ChangeEvent<String, String>> engine)
-    {
+    private static void closeEngine(DebeziumEngine<ChangeEvent<String, String>> engine) {
         try {
             engine.close();
         }
@@ -88,8 +85,7 @@ public class DamengDebeziumConnectorTest
         }
     }
 
-    private static String getCurrentDateString()
-    {
+    private static String getCurrentDateString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMdd");
         return dateFormat.format(new Date());
     }

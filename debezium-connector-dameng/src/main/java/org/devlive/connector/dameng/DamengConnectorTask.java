@@ -33,8 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DamengConnectorTask
-        extends BaseSourceTask<MapBackedPartition, DamengOffsetContext>
-{
+        extends BaseSourceTask<MapBackedPartition, DamengOffsetContext> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DamengConnectorTask.class);
     private static final String CONTEXT_NAME = "dameng-connector-task";
 
@@ -45,14 +44,12 @@ public class DamengConnectorTask
     private volatile DamengDatabaseSchema schema;
 
     @Override
-    public String version()
-    {
+    public String version() {
         return Module.version();
     }
 
     @Override
-    public ChangeEventSourceCoordinator<MapBackedPartition, DamengOffsetContext> start(Configuration config)
-    {
+    public ChangeEventSourceCoordinator<MapBackedPartition, DamengOffsetContext> start(Configuration config) {
         DamengConnectorConfig connectorConfig = new DamengConnectorConfig(config);
         TopicSelector<TableId> topicSelector = DamengTopicSelector.defaultSelector(connectorConfig);
         SchemaNameAdjuster schemaNameAdjuster = SchemaNameAdjuster.create();
@@ -101,31 +98,29 @@ public class DamengConnectorTask
                 metadataProvider,
                 schemaNameAdjuster);
 
-        final DamengStreamingChangeEventSourceMetrics streamingMetrics =
-                new DamengStreamingChangeEventSourceMetrics(taskContext, queue, metadataProvider, connectorConfig);
+        final DamengStreamingChangeEventSourceMetrics streamingMetrics = new DamengStreamingChangeEventSourceMetrics(taskContext, queue, metadataProvider,
+                connectorConfig);
 
-        ChangeEventSourceFactory<MapBackedPartition, DamengOffsetContext> changeEventSourceFactory =
-                new DamengChangeEventSourceFactory(
-                        connectorConfig,
-                        jdbcConnection,
-                        errorHandler,
-                        dispatcher,
-                        clock,
-                        schema,
-                        jdbcConfig,
-                        taskContext,
-                        streamingMetrics);
+        ChangeEventSourceFactory<MapBackedPartition, DamengOffsetContext> changeEventSourceFactory = new DamengChangeEventSourceFactory(
+                connectorConfig,
+                jdbcConnection,
+                errorHandler,
+                dispatcher,
+                clock,
+                schema,
+                jdbcConfig,
+                taskContext,
+                streamingMetrics);
 
-        ChangeEventSourceCoordinator<MapBackedPartition, DamengOffsetContext> coordinator =
-                new ChangeEventSourceCoordinator<>(
-                        previousOffsets,
-                        errorHandler,
-                        DamengConnector.class,
-                        connectorConfig,
-                        changeEventSourceFactory,
-                        new DamengChangeEventSourceMetricsFactory<>(streamingMetrics),
-                        dispatcher,
-                        schema);
+        ChangeEventSourceCoordinator<MapBackedPartition, DamengOffsetContext> coordinator = new ChangeEventSourceCoordinator<>(
+                previousOffsets,
+                errorHandler,
+                DamengConnector.class,
+                connectorConfig,
+                changeEventSourceFactory,
+                new DamengChangeEventSourceMetricsFactory<>(streamingMetrics),
+                dispatcher,
+                schema);
 
         coordinator.start(taskContext, this.queue, metadataProvider);
 
@@ -134,8 +129,7 @@ public class DamengConnectorTask
 
     @Override
     public List<SourceRecord> doPoll()
-            throws InterruptedException
-    {
+            throws InterruptedException {
         List<DataChangeEvent> records = queue.poll();
 
         List<SourceRecord> sourceRecords = records.stream()
@@ -146,8 +140,7 @@ public class DamengConnectorTask
     }
 
     @Override
-    public void doStop()
-    {
+    public void doStop() {
         try {
             if (jdbcConnection != null) {
                 jdbcConnection.close();
@@ -161,8 +154,7 @@ public class DamengConnectorTask
     }
 
     @Override
-    protected Iterable<Field> getAllConfigurationFields()
-    {
+    protected Iterable<Field> getAllConfigurationFields() {
         return DamengConnectorConfig.ALLFIELDS;
     }
 
@@ -170,18 +162,15 @@ public class DamengConnectorTask
      * 内部类实现分区提供者
      */
     private static class MapBackedPartitionProvider
-            implements Partition.Provider<MapBackedPartition>
-    {
+            implements Partition.Provider<MapBackedPartition> {
         private final DamengConnectorConfig connectorConfig;
 
-        public MapBackedPartitionProvider(DamengConnectorConfig connectorConfig)
-        {
+        public MapBackedPartitionProvider(DamengConnectorConfig connectorConfig) {
             this.connectorConfig = connectorConfig;
         }
 
         @Override
-        public Set<MapBackedPartition> getPartitions()
-        {
+        public Set<MapBackedPartition> getPartitions() {
             Map<String, String> map = Maps.newHashMap();
             map.put("server", connectorConfig.getLogicalName());
             // 创建一个只包含逻辑名称的分区

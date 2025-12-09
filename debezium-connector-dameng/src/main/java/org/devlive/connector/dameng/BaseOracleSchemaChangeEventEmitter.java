@@ -23,10 +23,9 @@ import java.util.Set;
  *
  * @author Gunnar Morling
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2" })
 public class BaseOracleSchemaChangeEventEmitter
-        implements SchemaChangeEventEmitter
-{
+        implements SchemaChangeEventEmitter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseOracleSchemaChangeEventEmitter.class);
 
     private final DamengOffsetContext offsetContext;
@@ -37,9 +36,8 @@ public class BaseOracleSchemaChangeEventEmitter
     private final String commandType;
 
     public BaseOracleSchemaChangeEventEmitter(DamengOffsetContext offsetContext, TableId tableId,
-            String sourceDatabaseName, String objectOwner, String ddlText,
-            String commandType)
-    {
+                                              String sourceDatabaseName, String objectOwner, String ddlText,
+                                              String commandType) {
         this.offsetContext = offsetContext;
         this.tableId = tableId;
         this.sourceDatabaseName = sourceDatabaseName;
@@ -50,8 +48,7 @@ public class BaseOracleSchemaChangeEventEmitter
 
     @Override
     public void emitSchemaChangeEvent(Receiver receiver)
-            throws InterruptedException
-    {
+            throws InterruptedException {
         SchemaChangeEventType eventType = getSchemaChangeEventType();
         if (eventType == null) {
             return;
@@ -126,8 +123,7 @@ public class BaseOracleSchemaChangeEventEmitter
         receiver.schemaChangeEvent(event);
     }
 
-    private SchemaChangeEventType getSchemaChangeEventType()
-    {
+    private SchemaChangeEventType getSchemaChangeEventType() {
         switch (commandType) {
             case "CREATE TABLE":
                 return SchemaChangeEventType.CREATE;

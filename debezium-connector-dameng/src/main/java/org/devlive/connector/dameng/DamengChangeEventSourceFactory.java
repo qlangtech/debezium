@@ -22,10 +22,9 @@ import org.devlive.connector.dameng.logminer.LogMinerStreamingChangeEventSource;
 
 import java.util.Optional;
 
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "DLS_DEAD_LOCAL_STORE"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2", "DLS_DEAD_LOCAL_STORE" })
 public class DamengChangeEventSourceFactory
-        implements ChangeEventSourceFactory<MapBackedPartition, DamengOffsetContext>
-{
+        implements ChangeEventSourceFactory<MapBackedPartition, DamengOffsetContext> {
     private final DamengConnectorConfig configuration;
     private final DamengConnection jdbcConnection;
     private final ErrorHandler errorHandler;
@@ -37,17 +36,15 @@ public class DamengChangeEventSourceFactory
     private final DamengStreamingChangeEventSourceMetrics streamingMetrics;
 
     public DamengChangeEventSourceFactory(
-            DamengConnectorConfig configuration,
-            DamengConnection jdbcConnection,
-            ErrorHandler errorHandler,
-            EventDispatcher<MapBackedPartition, TableId> dispatcher,
-            Clock clock,
-            DamengDatabaseSchema schema,
-            Configuration jdbcConfig,
-            DamengTaskContext taskContext,
-            DamengStreamingChangeEventSourceMetrics streamingMetrics
-    )
-    {
+                                          DamengConnectorConfig configuration,
+                                          DamengConnection jdbcConnection,
+                                          ErrorHandler errorHandler,
+                                          EventDispatcher<MapBackedPartition, TableId> dispatcher,
+                                          Clock clock,
+                                          DamengDatabaseSchema schema,
+                                          Configuration jdbcConfig,
+                                          DamengTaskContext taskContext,
+                                          DamengStreamingChangeEventSourceMetrics streamingMetrics) {
         this.configuration = configuration;
         this.jdbcConnection = jdbcConnection;
         this.errorHandler = errorHandler;
@@ -61,21 +58,18 @@ public class DamengChangeEventSourceFactory
 
     @Override
     public SnapshotChangeEventSource<MapBackedPartition, DamengOffsetContext> getSnapshotChangeEventSource(
-            SnapshotProgressListener<MapBackedPartition> snapshotProgressListener)
-    {
+                                                                                                           SnapshotProgressListener<MapBackedPartition> snapshotProgressListener) {
         return new DamengSnapshotChangeEventSource(
                 configuration,
                 jdbcConnection,
                 schema,
                 dispatcher,
                 clock,
-                snapshotProgressListener
-        );
+                snapshotProgressListener);
     }
 
     @Override
-    public StreamingChangeEventSource<MapBackedPartition, DamengOffsetContext> getStreamingChangeEventSource()
-    {
+    public StreamingChangeEventSource<MapBackedPartition, DamengOffsetContext> getStreamingChangeEventSource() {
         return new LogMinerStreamingChangeEventSource(
                 configuration,
                 jdbcConnection,
@@ -85,16 +79,14 @@ public class DamengChangeEventSourceFactory
                 schema,
                 taskContext,
                 jdbcConfig,
-                streamingMetrics
-        );
+                streamingMetrics);
     }
 
     @Override
     public Optional<IncrementalSnapshotChangeEventSource<MapBackedPartition, ? extends DataCollectionId>> getIncrementalSnapshotChangeEventSource(
-            DamengOffsetContext offsetContext,
-            SnapshotProgressListener<MapBackedPartition> snapshotProgressListener,
-            DataChangeEventListener<MapBackedPartition> dataChangeEventListener)
-    {
+                                                                                                                                                  DamengOffsetContext offsetContext,
+                                                                                                                                                  SnapshotProgressListener<MapBackedPartition> snapshotProgressListener,
+                                                                                                                                                  DataChangeEventListener<MapBackedPartition> dataChangeEventListener) {
         // 如果需要实现增量快照，可以在这里返回实现
         // 默认返回空实现
         return Optional.empty();

@@ -14,7 +14,6 @@ import io.debezium.config.Field;
 import io.debezium.config.Field.ValidationOutput;
 import io.debezium.connector.AbstractSourceInfo;
 import io.debezium.connector.SourceInfoStructMaker;
-import io.debezium.connector.oracle.Scn;
 import io.debezium.document.Document;
 import io.debezium.jdbc.JdbcConfiguration;
 import io.debezium.relational.ColumnFilterMode;
@@ -46,10 +45,9 @@ import java.util.Set;
  *
  * @author Gunnar Morling
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP", "MS_SHOULD_BE_FINAL", "NP_NULL_PARAM_DEREF", "NP_BOOLEAN_RETURN_NULL", "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP", "MS_SHOULD_BE_FINAL", "NP_NULL_PARAM_DEREF", "NP_BOOLEAN_RETURN_NULL", "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" })
 public class DamengConnectorConfig
-        extends HistorizedRelationalDatabaseConnectorConfig
-{
+        extends HistorizedRelationalDatabaseConnectorConfig {
     public static final Field PDB_NAME = Field.create(DATABASE_CONFIG_PREFIX + "pdb.name")
             .withDisplayName("PDB name")
             .withType(Type.STRING)
@@ -307,8 +305,7 @@ public class DamengConnectorConfig
                     LOG_MINING_SLEEP_TIME_INCREMENT_MS,
                     LOG_MINING_TRANSACTION_RETENTION,
                     LOG_MINING_DML_PARSER,
-                    AUTO_COMMIT_TIMEOUT
-            )
+                    AUTO_COMMIT_TIMEOUT)
             .create();
     private final String oracleVersion;
     private final HistoryRecorder logMiningHistoryRecorder;
@@ -337,8 +334,7 @@ public class DamengConnectorConfig
     private final Long autoCommitTimeout;
     private final LogMiningDmlParser dmlParser;
 
-    public DamengConnectorConfig(Configuration config)
-    {
+    public DamengConnectorConfig(Configuration config) {
         super(
                 DamengConnector.class,
                 config,
@@ -347,8 +343,7 @@ public class DamengConnectorConfig
                 x -> x.schema() + "." + x.table(),
                 true,
                 ColumnFilterMode.SCHEMA,
-                false
-        );
+                false);
 
         this.databaseName = toUpperCase(config.getString(DATABASE_NAME));
         this.pdbName = toUpperCase(config.getString(PDB_NAME));
@@ -380,34 +375,29 @@ public class DamengConnectorConfig
         this.autoCommitTimeout = config.getLong(AUTO_COMMIT_TIMEOUT);
     }
 
-    public static ConfigDef configDef()
-    {
+    public static ConfigDef configDef() {
         return CONFIG_DEFINITION.configDef();
     }
 
-    private static String toUpperCase(String property)
-    {
+    private static String toUpperCase(String property) {
         return property == null ? null : property.toUpperCase();
     }
 
-    private static HistoryRecorder resolveLogMiningHistoryRecorder(Configuration config)
-    {
+    private static HistoryRecorder resolveLogMiningHistoryRecorder(Configuration config) {
         if (!config.hasKey(LOG_MINING_HISTORY_RECORDER_CLASS.name())) {
             return new NeverHistoryRecorder();
         }
         return config.getInstance(LOG_MINING_HISTORY_RECORDER_CLASS, HistoryRecorder.class);
     }
 
-    public static int validateOutServerName(Configuration config, Field field, ValidationOutput problems)
-    {
+    public static int validateOutServerName(Configuration config, Field field, ValidationOutput problems) {
         if (ConnectorAdapter.XSTREAM.equals(ConnectorAdapter.parse(config.getString(CONNECTOR_ADAPTER)))) {
             return Field.isRequired(config, field, problems);
         }
         return 0;
     }
 
-    public static int requiredWhenNoUrl(Configuration config, Field field, ValidationOutput problems)
-    {
+    public static int requiredWhenNoUrl(Configuration config, Field field, ValidationOutput problems) {
         // Validates that the field is required but only when an URL field is not present
         if (config.getString(URL) == null) {
             return Field.isRequired(config, field, problems);
@@ -415,8 +405,7 @@ public class DamengConnectorConfig
         return 0;
     }
 
-    public static int requiredWhenNoHostname(Configuration config, Field field, ValidationOutput problems)
-    {
+    public static int requiredWhenNoHostname(Configuration config, Field field, ValidationOutput problems) {
         // Validates that the field is required but only when an URL field is not present
         if (config.getString(HOSTNAME) == null) {
             return Field.isRequired(config, field, problems);
@@ -424,8 +413,7 @@ public class DamengConnectorConfig
         return 0;
     }
 
-    private static Boolean resolveTableNameCaseInsensitivity(Configuration config)
-    {
+    private static Boolean resolveTableNameCaseInsensitivity(Configuration config) {
         if (config.hasKey(TABLENAME_CASE_INSENSITIVE.name())) {
             LOGGER.warn("The option '{}' is deprecated and will be removed in the future.", TABLENAME_CASE_INSENSITIVE.name());
             return config.getBoolean(TABLENAME_CASE_INSENSITIVE);
@@ -433,28 +421,23 @@ public class DamengConnectorConfig
         return null;
     }
 
-    public String getDatabaseName()
-    {
+    public String getDatabaseName() {
         return databaseName;
     }
 
-    public String getPdbName()
-    {
+    public String getPdbName() {
         return pdbName;
     }
 
-    public String getCatalogName()
-    {
+    public String getCatalogName() {
         return pdbName != null ? pdbName : databaseName;
     }
 
-    public String getXoutServerName()
-    {
+    public String getXoutServerName() {
         return xoutServerName;
     }
 
-    public SnapshotMode getSnapshotMode()
-    {
+    public SnapshotMode getSnapshotMode() {
         return snapshotMode;
     }
 
@@ -465,24 +448,19 @@ public class DamengConnectorConfig
      *
      * @return whether table case is insensitive, may be {@code null}.
      */
-    public Optional<Boolean> getTablenameCaseInsensitive()
-    {
+    public Optional<Boolean> getTablenameCaseInsensitive() {
         return Optional.ofNullable(tablenameCaseInsensitive);
     }
 
-    public String getOracleVersion()
-    {
+    public String getOracleVersion() {
         return oracleVersion;
     }
 
     @Override
-    protected HistoryRecordComparator getHistoryRecordComparator()
-    {
-        return new HistoryRecordComparator()
-        {
+    protected HistoryRecordComparator getHistoryRecordComparator() {
+        return new HistoryRecordComparator() {
             @Override
-            protected boolean isPositionAtOrBefore(Document recorded, Document desired)
-            {
+            protected boolean isPositionAtOrBefore(Document recorded, Document desired) {
                 Scn recordedScn;
                 Scn desiredScn;
                 if (getAdapter() == ConnectorAdapter.XSTREAM) {
@@ -495,8 +473,7 @@ public class DamengConnectorConfig
                 }
             }
 
-            private Scn resolveScn(Document document)
-            {
+            private Scn resolveScn(Document document) {
                 // prioritize reading scn as string and if not found, fallback to long data types
                 final String scn = document.getString(SourceInfo.SCN_KEY);
                 if (scn == null) {
@@ -509,190 +486,165 @@ public class DamengConnectorConfig
     }
 
     @Override
-    protected SourceInfoStructMaker<? extends AbstractSourceInfo> getSourceInfoStructMaker(Version version)
-    {
+    protected SourceInfoStructMaker<? extends AbstractSourceInfo> getSourceInfoStructMaker(Version version) {
         return new DamengSourceInfoStructMaker(Module.name(), Module.version(), this);
     }
 
     @Override
-    public String getContextName()
-    {
+    public String getContextName() {
         return Module.contextName();
     }
 
     /**
      * @return connection adapter
      */
-    public ConnectorAdapter getAdapter()
-    {
+    public ConnectorAdapter getAdapter() {
         return connectorAdapter;
     }
 
     /**
      * @return Log Mining strategy
      */
-    public LogMiningStrategy getLogMiningStrategy()
-    {
+    public LogMiningStrategy getLogMiningStrategy() {
         return logMiningStrategy;
     }
 
     /**
      * @return whether log mining history is recorded
      */
-    public Boolean isLogMiningHistoryRecorded()
-    {
+    public Boolean isLogMiningHistoryRecorded() {
         return logMiningHistoryRetentionHours > 0;
     }
 
     /**
      * @return the log mining history recorder implementation, may be null
      */
-    public HistoryRecorder getLogMiningHistoryRecorder()
-    {
+    public HistoryRecorder getLogMiningHistoryRecorder() {
         return logMiningHistoryRecorder;
     }
 
     /**
      * @return the number of hours log mining history is retained if history is recorded
      */
-    public long getLogMinerHistoryRetentionHours()
-    {
+    public long getLogMinerHistoryRetentionHours() {
         return logMiningHistoryRetentionHours;
     }
 
     /**
      * @return whether Oracle is using RAC
      */
-    public Boolean isRacSystem()
-    {
+    public Boolean isRacSystem() {
         return !racNodes.isEmpty();
     }
 
     /**
      * @return set of node hosts or ip addresses used in Oracle RAC
      */
-    public Set<String> getRacNodes()
-    {
+    public Set<String> getRacNodes() {
         return racNodes;
     }
 
     /**
      * @return String token to replace
      */
-    public String getTokenToReplaceInSnapshotPredicate()
-    {
+    public String getTokenToReplaceInSnapshotPredicate() {
         return snapshotEnhancementToken;
     }
 
     /**
      * @return whether continuous log mining is enabled
      */
-    public boolean isContinuousMining()
-    {
+    public boolean isContinuousMining() {
         return logMiningContinuousMine;
     }
 
     /**
      * @return the duration that archive logs are scanned for log mining
      */
-    public Duration getLogMiningArchiveLogRetention()
-    {
+    public Duration getLogMiningArchiveLogRetention() {
         return logMiningArchiveLogRetention;
     }
 
     /**
      * @return int The minimum SCN interval used when mining redo/archive logs
      */
-    public int getLogMiningBatchSizeMin()
-    {
+    public int getLogMiningBatchSizeMin() {
         return logMiningBatchSizeMin;
     }
 
     /**
      * @return int Number of actual records that will be fetched from the log mining contents view
      */
-    public int getLogMiningViewFetchSize()
-    {
+    public int getLogMiningViewFetchSize() {
         return logMiningViewFetchSize;
     }
 
     /**
      * @return int The maximum SCN interval used when mining redo/archive logs
      */
-    public int getLogMiningBatchSizeMax()
-    {
+    public int getLogMiningBatchSizeMax() {
         return logMiningBatchSizeMax;
     }
 
     /**
      * @return int The default SCN interval used when mining redo/archive logs
      */
-    public int getLogMiningBatchSizeDefault()
-    {
+    public int getLogMiningBatchSizeDefault() {
         return logMiningBatchSizeDefault;
     }
 
     /**
      * @return int The minimum sleep time used when mining redo/archive logs
      */
-    public Duration getLogMiningSleepTimeMin()
-    {
+    public Duration getLogMiningSleepTimeMin() {
         return logMiningSleepTimeMin;
     }
 
     /**
      * @return int The maximum sleep time used when mining redo/archive logs
      */
-    public Duration getLogMiningSleepTimeMax()
-    {
+    public Duration getLogMiningSleepTimeMax() {
         return logMiningSleepTimeMax;
     }
 
     /**
      * @return int The default sleep time used when mining redo/archive logs
      */
-    public Duration getLogMiningSleepTimeDefault()
-    {
+    public Duration getLogMiningSleepTimeDefault() {
         return logMiningSleepTimeDefault;
     }
 
     /**
      * @return int The increment in sleep time when doing auto-tuning while mining redo/archive logs
      */
-    public Duration getLogMiningSleepTimeIncrement()
-    {
+    public Duration getLogMiningSleepTimeIncrement() {
         return logMiningSleepTimeIncrement;
     }
 
     /**
      * @return the duration for which long running transactions are permitted in the transaction buffer between log switches
      */
-    public Duration getLogMiningTransactionRetention()
-    {
+    public Duration getLogMiningTransactionRetention() {
         return logMiningTransactionRetention;
     }
 
-    public long getAutoCommitTimeoutMs()
-    {
+    public long getAutoCommitTimeoutMs() {
         return this.autoCommitTimeout;
     }
 
     /**
      * @return the log mining parser implementation to be used
      */
-    public LogMiningDmlParser getLogMiningDmlParser()
-    {
+    public LogMiningDmlParser getLogMiningDmlParser() {
         return dmlParser;
     }
 
-    public Configuration jdbcConfig()
-    {
+    public Configuration jdbcConfig() {
         return jdbcConfig;
     }
 
     @Override
-    public String getConnectorName()
-    {
+    public String getConnectorName() {
         return Module.name();
     }
 
@@ -700,8 +652,7 @@ public class DamengConnectorConfig
      * The set of predefined SnapshotMode options or aliases.
      */
     public enum SnapshotMode
-            implements EnumeratedValue
-    {
+            implements EnumeratedValue {
         /**
          * Perform a snapshot of data and schema upon initial startup of a connector.
          */
@@ -715,8 +666,7 @@ public class DamengConnectorConfig
         private final String value;
         private final boolean includeData;
 
-        SnapshotMode(String value, boolean includeData)
-        {
+        SnapshotMode(String value, boolean includeData) {
             this.value = value;
             this.includeData = includeData;
         }
@@ -727,8 +677,7 @@ public class DamengConnectorConfig
          * @param value the configuration property value; may not be null
          * @return the matching option, or null if no match is found
          */
-        public static SnapshotMode parse(String value)
-        {
+        public static SnapshotMode parse(String value) {
             if (value == null) {
                 return null;
             }
@@ -750,8 +699,7 @@ public class DamengConnectorConfig
          * @param defaultValue the default value; may be null
          * @return the matching option, or null if no match is found and the non-null default is invalid
          */
-        public static SnapshotMode parse(String value, String defaultValue)
-        {
+        public static SnapshotMode parse(String value, String defaultValue) {
             SnapshotMode mode = parse(value);
 
             if (mode == null && defaultValue != null) {
@@ -762,8 +710,7 @@ public class DamengConnectorConfig
         }
 
         @Override
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
 
@@ -771,22 +718,19 @@ public class DamengConnectorConfig
          * Whether this snapshotting mode should include the actual data or just the
          * schema of captured tables.
          */
-        public boolean includeData()
-        {
+        public boolean includeData() {
             return includeData;
         }
     }
 
     public enum ConnectorAdapter
-            implements EnumeratedValue
-    {
+            implements EnumeratedValue {
         /**
          * This is based on XStream API.
          */
         XSTREAM("XStream") {
             @Override
-            public String getConnectionUrl()
-            {
+            public String getConnectionUrl() {
                 return "jdbc:oracle:oci:@${" + JdbcConfiguration.HOSTNAME + "}:${" + JdbcConfiguration.PORT + "}/${" + JdbcConfiguration.DATABASE + "}";
             }
         },
@@ -796,16 +740,14 @@ public class DamengConnectorConfig
          */
         LOG_MINER("LogMiner") {
             @Override
-            public String getConnectionUrl()
-            {
+            public String getConnectionUrl() {
                 return "jdbc:oracle:thin:@${" + JdbcConfiguration.HOSTNAME + "}:${" + JdbcConfiguration.PORT + "}/${" + JdbcConfiguration.DATABASE + "}";
             }
         };
 
         private final String value;
 
-        ConnectorAdapter(String value)
-        {
+        ConnectorAdapter(String value) {
             this.value = value;
         }
 
@@ -815,8 +757,7 @@ public class DamengConnectorConfig
          * @param value the configuration property value; may not be null
          * @return the matching option, or null if no match is found
          */
-        public static ConnectorAdapter parse(String value)
-        {
+        public static ConnectorAdapter parse(String value) {
             if (value == null) {
                 return ConnectorAdapter.LOG_MINER;
             }
@@ -829,8 +770,7 @@ public class DamengConnectorConfig
             return null;
         }
 
-        public static ConnectorAdapter parse(String value, String defaultValue)
-        {
+        public static ConnectorAdapter parse(String value, String defaultValue) {
             ConnectorAdapter mode = parse(value);
 
             if (mode == null && defaultValue != null) {
@@ -843,15 +783,13 @@ public class DamengConnectorConfig
         public abstract String getConnectionUrl();
 
         @Override
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
     }
 
     public enum LogMiningStrategy
-            implements EnumeratedValue
-    {
+            implements EnumeratedValue {
         /**
          * This strategy uses LogMiner with data dictionary in online catalog.
          * This option will not capture DDL , but acts fast on REDO LOG switch events
@@ -869,8 +807,7 @@ public class DamengConnectorConfig
 
         private final String value;
 
-        LogMiningStrategy(String value)
-        {
+        LogMiningStrategy(String value) {
             this.value = value;
         }
 
@@ -880,8 +817,7 @@ public class DamengConnectorConfig
          * @param value the configuration property value; may not be null
          * @return the matching option, or null if no match is found
          */
-        public static LogMiningStrategy parse(String value)
-        {
+        public static LogMiningStrategy parse(String value) {
             if (value == null) {
                 return null;
             }
@@ -894,8 +830,7 @@ public class DamengConnectorConfig
             return null;
         }
 
-        public static LogMiningStrategy parse(String value, String defaultValue)
-        {
+        public static LogMiningStrategy parse(String value, String defaultValue) {
             LogMiningStrategy mode = parse(value);
 
             if (mode == null && defaultValue != null) {
@@ -906,27 +841,23 @@ public class DamengConnectorConfig
         }
 
         @Override
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
     }
 
     public enum LogMiningDmlParser
-            implements EnumeratedValue
-    {
+            implements EnumeratedValue {
         LEGACY("legacy"),
         FAST("fast");
 
         private final String value;
 
-        LogMiningDmlParser(String value)
-        {
+        LogMiningDmlParser(String value) {
             this.value = value;
         }
 
-        public static LogMiningDmlParser parse(String value)
-        {
+        public static LogMiningDmlParser parse(String value) {
             if (value == null) {
                 return null;
             }
@@ -939,8 +870,7 @@ public class DamengConnectorConfig
             return null;
         }
 
-        public static LogMiningDmlParser parse(String value, String defaultValue)
-        {
+        public static LogMiningDmlParser parse(String value, String defaultValue) {
             LogMiningDmlParser mode = parse(value);
             if (mode == null && defaultValue != null) {
                 mode = parse(defaultValue);
@@ -949,8 +879,7 @@ public class DamengConnectorConfig
         }
 
         @Override
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
     }
@@ -961,28 +890,23 @@ public class DamengConnectorConfig
      * @author Gunnar Morling
      */
     private static class SystemTablesPredicate
-            implements TableFilter
-    {
+            implements TableFilter {
         private final Configuration config;
 
-        SystemTablesPredicate(Configuration config)
-        {
+        SystemTablesPredicate(Configuration config) {
             this.config = config;
         }
 
         @Override
-        public boolean isIncluded(TableId t)
-        {
+        public boolean isIncluded(TableId t) {
             return !isExcludedSchema(t) && !isFlushTable(t);
         }
 
-        private boolean isExcludedSchema(TableId id)
-        {
+        private boolean isExcludedSchema(TableId id) {
             return EXCLUDED_SCHEMAS.contains(id.schema().toLowerCase());
         }
 
-        private boolean isFlushTable(TableId id)
-        {
+        private boolean isFlushTable(TableId id) {
             final String schema = config.getString(USER);
             return id.table().equalsIgnoreCase(SqlUtils.LOGMNR_FLUSH_TABLE) && id.schema().equalsIgnoreCase(schema);
         }

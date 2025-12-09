@@ -40,11 +40,10 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@SuppressFBWarnings(value = {"CT_CONSTRUCTOR_THROW", "OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE", "ODR_OPEN_DATABASE_RESOURCE",
-        "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"})
+@SuppressFBWarnings(value = { "CT_CONSTRUCTOR_THROW", "OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE", "ODR_OPEN_DATABASE_RESOURCE",
+        "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" })
 public class DamengConnection
-        extends JdbcConnection
-{
+        extends JdbcConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(DamengConnection.class);
 
     /**
@@ -55,8 +54,7 @@ public class DamengConnection
     /**
      * Pattern to identify system generated indices and column names.
      */
-    private static final Pattern SYS_NC_PATTERN =
-            Pattern.compile("^SYS_NC(?:_OID|_ROWINFO|[0-9][0-9][0-9][0-9][0-9])\\$$");
+    private static final Pattern SYS_NC_PATTERN = Pattern.compile("^SYS_NC(?:_OID|_ROWINFO|[0-9][0-9][0-9][0-9][0-9])\\$$");
 
     /**
      * A field for the raw jdbc url. This field has no default value.
@@ -68,25 +66,20 @@ public class DamengConnection
      */
     private final DamengDatabaseVersion databaseVersion;
 
-    public DamengConnection(Configuration config, Supplier<ClassLoader> classLoaderSupplier)
-    {
+    public DamengConnection(Configuration config, Supplier<ClassLoader> classLoaderSupplier) {
         super(JdbcConfiguration.adapt(config), resolveConnectionFactory(config), classLoaderSupplier, "\"", "\"");
 
         this.databaseVersion = resolveOracleDatabaseVersion();
         LOGGER.info("Database Version: {}", databaseVersion.getBanner());
     }
 
-    public static String connectionString(Configuration config)
-    {
+    public static String connectionString(Configuration config) {
         return config.getString(URL) != null
                 ? config.getString(URL)
                 : ConnectorAdapter.parse(config.getString("connection.adapter")).getConnectionUrl();
     }
 
-    private static ConnectionFactory resolveConnectionFactory(Configuration config)
-    {
-
-
+    private static ConnectionFactory resolveConnectionFactory(Configuration config) {
 
         // return JdbcConnection.patternBasedFactory(connectionString(config));
         return JdbcConnection.patternBasedFactory(
@@ -95,8 +88,7 @@ public class DamengConnection
                 DamengConnection.class.getClassLoader());
     }
 
-    public void setSessionToPdb(String pdbName)
-    {
+    public void setSessionToPdb(String pdbName) {
         Statement statement = null;
 
         try {
@@ -118,8 +110,7 @@ public class DamengConnection
         }
     }
 
-    public void resetSessionToCdb()
-    {
+    public void resetSessionToCdb() {
         Statement statement = null;
 
         try {
@@ -141,27 +132,24 @@ public class DamengConnection
         }
     }
 
-    public DamengDatabaseVersion getOracleVersion()
-    {
+    public DamengDatabaseVersion getOracleVersion() {
         return databaseVersion;
     }
 
-    private DamengDatabaseVersion resolveOracleDatabaseVersion()
-    {
+    private DamengDatabaseVersion resolveOracleDatabaseVersion() {
         String versionStr;
         try {
             try {
                 // Oracle 18.1 introduced BANNER_FULL as the new column rather than BANNER
                 // This column uses a different format than the legacy BANNER.
-                versionStr =
-                        queryAndMap(
-                                "SELECT BANNER FROM V$VERSION WHERE BANNER LIKE 'DM Database%'",
-                                (rs) -> {
-                                    if (rs.next()) {
-                                        return rs.getString(1);
-                                    }
-                                    return null;
-                                });
+                versionStr = queryAndMap(
+                        "SELECT BANNER FROM V$VERSION WHERE BANNER LIKE 'DM Database%'",
+                        (rs) -> {
+                            if (rs.next()) {
+                                return rs.getString(1);
+                            }
+                            return null;
+                        });
             }
             catch (SQLException e) {
                 // exception ignored
@@ -179,15 +167,14 @@ public class DamengConnection
             // this will cause versionStr to remain null, use fallback column BANNER for versions prior to
             // 18.1.
             if (versionStr == null) {
-                versionStr =
-                        queryAndMap(
-                                "SELECT BANNER FROM V$VERSION WHERE BANNER LIKE 'Oracle Database%'",
-                                (rs) -> {
-                                    if (rs.next()) {
-                                        return rs.getString(1);
-                                    }
-                                    return null;
-                                });
+                versionStr = queryAndMap(
+                        "SELECT BANNER FROM V$VERSION WHERE BANNER LIKE 'Oracle Database%'",
+                        (rs) -> {
+                            if (rs.next()) {
+                                return rs.getString(1);
+                            }
+                            return null;
+                        });
             }
         }
         catch (SQLException e) {
@@ -203,12 +190,11 @@ public class DamengConnection
 
     @Override
     public Set<TableId> readTableNames(
-            String databaseCatalog,
-            String schemaNamePattern,
-            String tableNamePattern,
-            String[] tableTypes)
-            throws SQLException
-    {
+                                       String databaseCatalog,
+                                       String schemaNamePattern,
+                                       String tableNamePattern,
+                                       String[] tableTypes)
+            throws SQLException {
         Set<TableId> tableIds = super.readTableNames(null, schemaNamePattern, tableNamePattern, tableTypes);
 
         return tableIds.stream()
@@ -225,21 +211,19 @@ public class DamengConnection
      * @throws SQLException if a database exception occurred
      */
     protected Set<TableId> getAllTableIds(String catalogName)
-            throws SQLException
-    {
-        final String query =
-                "SELECT OWNER, TABLE_NAME FROM ALL_TABLES "
-                        +
-                        // filter special spatial tables
-                        "WHERE table_name NOT LIKE 'MDRT_%' "
-                        + "AND table_name NOT LIKE 'MDRS_%' "
-                        + "AND table_name NOT LIKE 'MDXT_%' "
-                        +
-                        // filter index-organized-tables
-                        "AND (table_name NOT LIKE 'SYS_IOT_OVER_%' "
-                        +
-                        // "and IOT_NAME IS NULL" +
-                        ") ";
+            throws SQLException {
+        final String query = "SELECT OWNER, TABLE_NAME FROM ALL_TABLES "
+                +
+                // filter special spatial tables
+                "WHERE table_name NOT LIKE 'MDRT_%' "
+                + "AND table_name NOT LIKE 'MDRS_%' "
+                + "AND table_name NOT LIKE 'MDXT_%' "
+                +
+                // filter index-organized-tables
+                "AND (table_name NOT LIKE 'SYS_IOT_OVER_%' "
+                +
+                // "and IOT_NAME IS NULL" +
+                ") ";
 
         Set<TableId> tableIds = new HashSet<>();
         query(
@@ -256,15 +240,13 @@ public class DamengConnection
 
     // todo replace metadata with something like this
     private ResultSet getTableColumnsInfo(String schemaNamePattern, String tableName)
-            throws SQLException
-    {
-        String columnQuery =
-                "select column_name, data_type, data_length, data_precision, data_scale, default_length, density, char_length from "
-                        + "all_tab_columns where owner like '"
-                        + schemaNamePattern
-                        + "' and table_name='"
-                        + tableName
-                        + "'";
+            throws SQLException {
+        String columnQuery = "select column_name, data_type, data_length, data_precision, data_scale, default_length, density, char_length from "
+                + "all_tab_columns where owner like '"
+                + schemaNamePattern
+                + "' and table_name='"
+                + tableName
+                + "'";
 
         PreparedStatement statement = connection().prepareStatement(columnQuery);
         return statement.executeQuery();
@@ -272,22 +254,20 @@ public class DamengConnection
 
     // this is much faster, we will use it until full replacement of the metadata usage TODO
     public void readSchemaForCapturedTables(
-            Tables tables,
-            String databaseCatalog,
-            String schemaNamePattern,
-            ColumnNameFilter columnFilter,
-            boolean removeTablesNotFoundInJdbc,
-            Set<TableId> capturedTables)
-            throws SQLException
-    {
+                                            Tables tables,
+                                            String databaseCatalog,
+                                            String schemaNamePattern,
+                                            ColumnNameFilter columnFilter,
+                                            boolean removeTablesNotFoundInJdbc,
+                                            Set<TableId> capturedTables)
+            throws SQLException {
         Set<TableId> tableIdsBefore = new HashSet<>(tables.tableIds());
 
         DatabaseMetaData metadata = connection().getMetaData();
         Map<TableId, List<Column>> columnsByTable = new HashMap<>();
 
         for (TableId tableId : capturedTables) {
-            try (ResultSet columnMetadata =
-                    metadata.getColumns(databaseCatalog, schemaNamePattern, tableId.table(), null)) {
+            try (ResultSet columnMetadata = metadata.getColumns(databaseCatalog, schemaNamePattern, tableId.table(), null)) {
                 while (columnMetadata.next()) {
                     // add all whitelisted columns
                     readTableColumn(columnMetadata, tableId, columnFilter)
@@ -325,21 +305,19 @@ public class DamengConnection
 
     @Override
     public void readSchema(
-            Tables tables,
-            String databaseCatalog,
-            String schemaNamePattern,
-            TableFilter tableFilter,
-            ColumnNameFilter columnFilter,
-            boolean removeTablesNotFoundInJdbc)
-            throws SQLException
-    {
+                           Tables tables,
+                           String databaseCatalog,
+                           String schemaNamePattern,
+                           TableFilter tableFilter,
+                           ColumnNameFilter columnFilter,
+                           boolean removeTablesNotFoundInJdbc)
+            throws SQLException {
         super.readSchema(
                 tables, null, schemaNamePattern, tableFilter, columnFilter, removeTablesNotFoundInJdbc);
 
-        Set<TableId> tableIds =
-                tables.tableIds().stream()
-                        .filter(x -> schemaNamePattern.equals(x.schema()))
-                        .collect(Collectors.toSet());
+        Set<TableId> tableIds = tables.tableIds().stream()
+                .filter(x -> schemaNamePattern.equals(x.schema()))
+                .collect(Collectors.toSet());
 
         for (TableId tableId : tableIds) {
             // super.readSchema() populates ids without the catalog; hence we apply the filtering only
@@ -356,9 +334,8 @@ public class DamengConnection
 
     @Override
     protected Optional<ColumnEditor> readTableColumn(
-            ResultSet columnMetadata, TableId tableId, ColumnNameFilter columnFilter)
-            throws SQLException
-    {
+                                                     ResultSet columnMetadata, TableId tableId, ColumnNameFilter columnFilter)
+            throws SQLException {
         // Oracle drivers require this for LONG/LONGRAW to be fetched first.
         final String defaultValue = columnMetadata.getString(13);
 
@@ -391,14 +368,12 @@ public class DamengConnection
 
     @Override
     public List<String> readTableUniqueIndices(DatabaseMetaData metadata, TableId id)
-            throws SQLException
-    {
+            throws SQLException {
         return super.readTableUniqueIndices(metadata, id.toDoubleQuoted());
     }
 
     @Override
-    protected boolean isTableUniqueIndexIncluded(String indexName, String columnName)
-    {
+    protected boolean isTableUniqueIndexIncluded(String indexName, String columnName) {
         if (columnName != null) {
             return !SYS_NC_PATTERN.matcher(columnName).matches();
         }
@@ -406,8 +381,7 @@ public class DamengConnection
     }
 
     private void overrideOracleSpecificColumnTypes(
-            Tables tables, TableId tableId, TableId tableIdWithCatalog)
-    {
+                                                   Tables tables, TableId tableId, TableId tableIdWithCatalog) {
         TableEditor editor = tables.editTable(tableId);
         editor.tableId(tableIdWithCatalog);
 
@@ -449,15 +423,13 @@ public class DamengConnection
      * @param connectorConfig the connector configuration
      * @return whether table name case insensitivity is used
      */
-    public boolean getTablenameCaseInsensitivity(DamengConnectorConfig connectorConfig)
-    {
+    public boolean getTablenameCaseInsensitivity(DamengConnectorConfig connectorConfig) {
         Optional<Boolean> configValue = connectorConfig.getTablenameCaseInsensitive();
         return configValue.orElse(getOracleVersion().getMajor() == 11);
     }
 
     public DamengConnection executeLegacy(String... sqlStatements)
-            throws SQLException
-    {
+            throws SQLException {
         return executeLegacy(
                 statement -> {
                     for (String sqlStatement : sqlStatements) {
@@ -469,8 +441,7 @@ public class DamengConnection
     }
 
     public DamengConnection executeLegacy(Operations operations)
-            throws SQLException
-    {
+            throws SQLException {
         Connection conn = connection();
         try (Statement statement = conn.createStatement()) {
             operations.apply(statement);

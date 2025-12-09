@@ -21,57 +21,49 @@ import java.util.List;
 /**
  * Emits change record based on a single {@link LogMinerDmlEntry} event.
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2" })
 public class LogMinerChangeRecordEmitter<P extends Partition>
-        extends BaseChangeRecordEmitter<LogMinerColumnValue, P>
-{
+        extends BaseChangeRecordEmitter<LogMinerColumnValue, P> {
     protected final Table table;
     private final LogMinerDmlEntry dmlEntry;
 
     public LogMinerChangeRecordEmitter(
-            P partition,
-            OffsetContext offset,
-            LogMinerDmlEntry dmlEntry,
-            Table table,
-            Clock clock
-    )
-    {
+                                       P partition,
+                                       OffsetContext offset,
+                                       LogMinerDmlEntry dmlEntry,
+                                       Table table,
+                                       Clock clock) {
         super(partition, offset, table, clock);
         this.dmlEntry = dmlEntry;
         this.table = table;
     }
 
     @Override
-    public Operation getOperation()
-    {
+    public Operation getOperation() {
         return dmlEntry.getCommandType();
     }
 
     @Override
-    protected Object[] getOldColumnValues()
-    {
+    protected Object[] getOldColumnValues() {
         List<LogMinerColumnValue> valueList = dmlEntry.getOldValues();
         LogMinerColumnValue[] result = Arrays.copyOf(valueList.toArray(), valueList.size(), LogMinerColumnValue[].class);
         return getColumnValues(result);
     }
 
     @Override
-    protected Object[] getNewColumnValues()
-    {
+    protected Object[] getNewColumnValues() {
         List<LogMinerColumnValue> valueList = dmlEntry.getNewValues();
         LogMinerColumnValue[] result = Arrays.copyOf(valueList.toArray(), valueList.size(), LogMinerColumnValue[].class);
         return getColumnValues(result);
     }
 
     @Override
-    protected String getColumnName(LogMinerColumnValue columnValue)
-    {
+    protected String getColumnName(LogMinerColumnValue columnValue) {
         return columnValue.getColumnName();
     }
 
     @Override
-    protected Object getColumnData(LogMinerColumnValue columnValue)
-    {
+    protected Object getColumnData(LogMinerColumnValue columnValue) {
         return columnValue.getColumnData();
     }
 }

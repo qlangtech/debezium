@@ -17,44 +17,38 @@ import java.sql.Types;
 /**
  * This class parses column definitions of Oracle statements.
  */
-@SuppressFBWarnings(value = {"DM_BOXED_PRIMITIVE_FOR_PARSING"})
+@SuppressFBWarnings(value = { "DM_BOXED_PRIMITIVE_FOR_PARSING" })
 public class ColumnDefinitionParserListener
-        extends BaseParserListener
-{
+        extends BaseParserListener {
     private final DataTypeResolver dataTypeResolver;
     private final TableEditor tableEditor;
     private ColumnEditor columnEditor;
 
     ColumnDefinitionParserListener(
-            final TableEditor tableEditor,
-            final ColumnEditor columnEditor,
-            final DataTypeResolver dataTypeResolver)
-    {
+                                   final TableEditor tableEditor,
+                                   final ColumnEditor columnEditor,
+                                   final DataTypeResolver dataTypeResolver) {
         this.dataTypeResolver = dataTypeResolver;
         this.tableEditor = tableEditor;
         this.columnEditor = columnEditor;
     }
 
-    void setColumnEditor(ColumnEditor columnEditor)
-    {
+    void setColumnEditor(ColumnEditor columnEditor) {
         this.columnEditor = columnEditor;
     }
 
-    Column getColumn()
-    {
+    Column getColumn() {
         return columnEditor.create();
     }
 
     @Override
-    public void enterColumn_definition(PlSqlParser.Column_definitionContext ctx)
-    {
+    public void enterColumn_definition(PlSqlParser.Column_definitionContext ctx) {
         resolveColumnDataType(ctx);
         super.enterColumn_definition(ctx);
     }
 
     @Override
-    public void enterPrimary_key_clause(PlSqlParser.Primary_key_clauseContext ctx)
-    {
+    public void enterPrimary_key_clause(PlSqlParser.Primary_key_clauseContext ctx) {
         // this rule will be parsed only if no primary key is set in a table
         // otherwise the statement can't be executed due to multiple primary key error
         columnEditor.optional(false);
@@ -64,8 +58,7 @@ public class ColumnDefinitionParserListener
     }
 
     // todo use dataTypeResolver instead
-    private void resolveColumnDataType(PlSqlParser.Column_definitionContext ctx)
-    {
+    private void resolveColumnDataType(PlSqlParser.Column_definitionContext ctx) {
         columnEditor.name(getColumnName(ctx.column_name()));
 
         PlSqlParser.Precision_partContext precisionPart = null;
@@ -159,7 +152,7 @@ public class ColumnDefinitionParserListener
             // PRECISION keyword is mandatory
             else if (ctx.datatype().native_datatype_element().FLOAT() != null
                     || (ctx.datatype().native_datatype_element().DOUBLE() != null
-                    && ctx.datatype().native_datatype_element().PRECISION() != null)) {
+                            && ctx.datatype().native_datatype_element().PRECISION() != null)) {
                 columnEditor.jdbcType(Types.FLOAT).type("FLOAT").length(126);
 
                 // TODO float's precision is about bits not decimal digits; should be ok for now to
@@ -239,22 +232,19 @@ public class ColumnDefinitionParserListener
         columnEditor.optional(!hasNotNullConstraint);
     }
 
-    private int getVarCharDefaultLength()
-    {
+    private int getVarCharDefaultLength() {
         // TODO replace with value from select name, value from v$parameter where
         // name='max_string_size';
         return 4000;
     }
 
     private void setPrecision(
-            PlSqlParser.Precision_partContext precisionPart, ColumnEditor columnEditor)
-    {
+                              PlSqlParser.Precision_partContext precisionPart, ColumnEditor columnEditor) {
         columnEditor.length(Integer.valueOf(precisionPart.numeric(0).getText()));
     }
 
     private void setScale(
-            PlSqlParser.Precision_partContext precisionPart, ColumnEditor columnEditor)
-    {
+                          PlSqlParser.Precision_partContext precisionPart, ColumnEditor columnEditor) {
         if (precisionPart.numeric().size() > 1) {
             columnEditor.scale(Integer.valueOf(precisionPart.numeric(1).getText()));
         }

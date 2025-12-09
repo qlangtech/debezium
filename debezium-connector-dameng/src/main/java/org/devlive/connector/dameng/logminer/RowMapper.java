@@ -8,7 +8,7 @@ package org.devlive.connector.dameng.logminer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.debezium.relational.TableId;
 import io.debezium.util.HexConverter;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +25,7 @@ import java.util.TimeZone;
  * The loss will be logged
  */
 @SuppressFBWarnings(value = "STCAL_STATIC_CALENDAR_INSTANCE")
-public class RowMapper
-{
+public class RowMapper {
     // operations
     public static final int INSERT = 1;
     public static final int DELETE = 2;
@@ -56,41 +55,36 @@ public class RowMapper
     // private static final int RS_ID = 12;
     // private static final int SSN = 12;
 
-    private RowMapper() {}
+    private RowMapper() {
+    }
 
     public static String getOperation(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getString(OPERATION);
     }
 
     public static String getUsername(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getString(USERNAME);
     }
 
     public static int getOperationCode(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getInt(OPERATION_CODE);
     }
 
     public static String getTableName(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getString(TABLE_NAME);
     }
 
     public static String getSegOwner(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getString(SEG_OWNER);
     }
 
     public static Timestamp getChangeTime(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         // CHANGE_TIME is in the database server time zone but does not store the time zone.
         // Without passing any calendar the timestamp is considered to be in the JVM time zone.
         // This would lead to incorrect conversions when calling e.g. Timestamp#toInstant() if database
@@ -100,8 +94,7 @@ public class RowMapper
     }
 
     public static Scn getScn(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         final String scn = rs.getString(SCN);
         if (scn == null) {
             return Scn.NULL;
@@ -110,8 +103,7 @@ public class RowMapper
     }
 
     public static String getTransactionId(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return HexConverter.convertToHexString(rs.getBytes("XID"));
     }
 
@@ -131,9 +123,8 @@ public class RowMapper
      * @return the redo SQL
      */
     public static String getSqlRedo(ResultSet rs, boolean isDml, HistoryRecorder historyRecorder, Scn scn, String tableName,
-            String segOwner, int operationCode, Timestamp changeTime, String txId)
-            throws SQLException
-    {
+                                    String segOwner, int operationCode, Timestamp changeTime, String txId)
+            throws SQLException {
         int lobLimitCounter = 9; // todo : decide on approach ( XStream chunk option) and Lob limit
 
         String redoSql = rs.getString("SQL_REDO");
@@ -167,20 +158,17 @@ public class RowMapper
     }
 
     public static String getRowId(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getString(ROW_ID);
     }
 
     public static int getRollbackFlag(ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return rs.getInt(ROLLBACK_FLAG);
     }
 
     public static TableId getTableId(String catalogName, ResultSet rs)
-            throws SQLException
-    {
+            throws SQLException {
         return new TableId(catalogName, rs.getString("SEG_OWNER"), rs.getString("TABLE_NAME"));
     }
 }

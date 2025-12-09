@@ -32,22 +32,18 @@ import static io.debezium.antlr.AntlrDdlParser.getText;
  * update "debezium" set "TEST" = '7' where "DUMMY" = '3' and "TEST" = '2' and "TEST1" = '6' and "TEST2" = '1'
  */
 public class UpdateParserListener
-        extends BaseDmlStringParserListener
-{
-    UpdateParserListener(String catalogName, String schemaName, OracleDmlParser parser)
-    {
+        extends BaseDmlStringParserListener {
+    UpdateParserListener(String catalogName, String schemaName, OracleDmlParser parser) {
         super(catalogName, schemaName, parser);
     }
 
     @Override
-    protected String getKey(Column column, int index)
-    {
+    protected String getKey(Column column, int index) {
         return column.name();
     }
 
     @Override
-    public void enterUpdate_statement(PlSqlParser.Update_statementContext ctx)
-    {
+    public void enterUpdate_statement(PlSqlParser.Update_statementContext ctx) {
         init(ctx.general_table_ref().dml_table_expression_clause());
         isUpdate = true;
         super.enterUpdate_statement(ctx);
@@ -59,8 +55,7 @@ public class UpdateParserListener
      * @param ctx where clause context
      */
     @Override
-    public void enterWhere_clause(PlSqlParser.Where_clauseContext ctx)
-    {
+    public void enterWhere_clause(PlSqlParser.Where_clauseContext ctx) {
         if (isUpdate) {
             parseRecursively(ctx.expression().logical_expression());
             ParserUtils.cloneOldToNewColumnValues(newColumnValues, oldColumnValues, table);
@@ -70,8 +65,7 @@ public class UpdateParserListener
     }
 
     @Override
-    public void enterColumn_based_update_set_clause(PlSqlParser.Column_based_update_set_clauseContext ctx)
-    {
+    public void enterColumn_based_update_set_clause(PlSqlParser.Column_based_update_set_clauseContext ctx) {
         if (table == null) {
             throw new ParsingException(null, "Trying to parse a statement for a table which does not exist. " +
                     "Statement: " + getText(ctx));
@@ -97,8 +91,7 @@ public class UpdateParserListener
     }
 
     @Override
-    public void exitUpdate_statement(PlSqlParser.Update_statementContext ctx)
-    {
+    public void exitUpdate_statement(PlSqlParser.Update_statementContext ctx) {
         List<LogMinerColumnValue> actualNewValues = newColumnValues.values().stream()
                 .filter(LogMinerColumnValueWrapper::isProcessed).map(LogMinerColumnValueWrapper::getColumnValue).collect(Collectors.toList());
         List<LogMinerColumnValue> actualOldValues = oldColumnValues.values().stream()

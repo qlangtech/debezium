@@ -38,10 +38,9 @@ import java.util.regex.Pattern;
 
 import static io.debezium.util.NumberConversions.BYTE_FALSE;
 
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "SA_LOCAL_SELF_ASSIGNMENT"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2", "SA_LOCAL_SELF_ASSIGNMENT" })
 public class DamengValueConverters
-        extends JdbcValueConverters
-{
+        extends JdbcValueConverters {
     private static final Pattern INTERVAL_DAY_SECOND_PATTERN = Pattern.compile("([+\\-])?(\\d+) (\\d+):(\\d+):(\\d+).(\\d+)");
 
     private static final ZoneId GMT_ZONE_ID = ZoneId.of("GMT");
@@ -84,15 +83,13 @@ public class DamengValueConverters
 
     private final DamengConnection connection;
 
-    public DamengValueConverters(DamengConnectorConfig config, DamengConnection connection)
-    {
+    public DamengValueConverters(DamengConnectorConfig config, DamengConnection connection) {
         super(config.getDecimalMode(), config.getTemporalPrecisionMode(), ZoneOffset.UTC, null, null, null);
         this.connection = connection;
     }
 
     @Override
-    public SchemaBuilder schemaBuilder(Column column)
-    {
+    public SchemaBuilder schemaBuilder(Column column) {
         logger.debug("Building schema for column {} of type {} named {} with constraints ({},{})",
                 column.name(),
                 column.jdbcType(),
@@ -116,8 +113,7 @@ public class DamengValueConverters
         }
     }
 
-    private SchemaBuilder getNumericSchema(Column column)
-    {
+    private SchemaBuilder getNumericSchema(Column column) {
         if (column.scale().isPresent()) {
             // return sufficiently sized int schema for non-floating point types
             Integer scale = column.scale().get();
@@ -153,8 +149,7 @@ public class DamengValueConverters
         }
     }
 
-    private SchemaBuilder variableScaleSchema(Column column)
-    {
+    private SchemaBuilder variableScaleSchema(Column column) {
         if (decimalMode == DecimalMode.PRECISE) {
             return VariableScaleDecimal.builder();
         }
@@ -162,8 +157,7 @@ public class DamengValueConverters
     }
 
     @Override
-    public ValueConverter converter(Column column, Field fieldDefn)
-    {
+    public ValueConverter converter(Column column, Field fieldDefn) {
         switch (column.jdbcType()) {
             case Types.CHAR:
             case Types.VARCHAR:
@@ -183,8 +177,7 @@ public class DamengValueConverters
         return super.converter(column, fieldDefn);
     }
 
-    private ValueConverter getNumericConverter(Column column, Field fieldDefn)
-    {
+    private ValueConverter getNumericConverter(Column column, Field fieldDefn) {
         if (column.scale().isPresent()) {
             Integer scale = column.scale().get();
 
@@ -219,8 +212,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertString(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertString(Column column, Field fieldDefn, Object data) {
         // if (data instanceof CHAR) {
         // return ((CHAR) data).stringValue();
         // }
@@ -243,8 +235,7 @@ public class DamengValueConverters
         return super.convertString(column, fieldDefn, data);
     }
 
-    private String convertOracleUnistr(Column column, Field fieldDefn, String data)
-    {
+    private String convertOracleUnistr(Column column, Field fieldDefn, String data) {
         if (data != null && data.length() > 0) {
             StringBuilder result = new StringBuilder();
             for (int i = 0; i < data.length(); ++i) {
@@ -271,8 +262,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertBinary(Column column, Field fieldDefn, Object data, BinaryHandlingMode mode)
-    {
+    protected Object convertBinary(Column column, Field fieldDefn, Object data, BinaryHandlingMode mode) {
         if (data instanceof Blob) {
             try {
                 Blob blob = (Blob) data;
@@ -286,8 +276,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertInteger(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertInteger(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             data = data.toString().trim();
         }
@@ -295,8 +284,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertFloat(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertFloat(Column column, Field fieldDefn, Object data) {
         if (data instanceof Float) {
             return data;
         }
@@ -308,8 +296,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertDouble(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertDouble(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             return Double.parseDouble((String) data);
         }
@@ -318,8 +305,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertDecimal(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertDecimal(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             // In the case when the value is of String, convert it to a BigDecimal so that we can then
             // aptly apply the scale adjustment below.
@@ -344,23 +330,19 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertNumeric(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertNumeric(Column column, Field fieldDefn, Object data) {
         return convertDecimal(column, fieldDefn, data);
     }
 
-    protected Object convertNumericAsTinyInt(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertNumericAsTinyInt(Column column, Field fieldDefn, Object data) {
         return convertTinyInt(column, fieldDefn, data);
     }
 
-    protected Object convertNumericAsSmallInt(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertNumericAsSmallInt(Column column, Field fieldDefn, Object data) {
         return super.convertSmallInt(column, fieldDefn, data);
     }
 
-    protected Object convertNumericAsInteger(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertNumericAsInteger(Column column, Field fieldDefn, Object data) {
         // 如果数据是字符串类型，先进行trim处理
         if (data instanceof String) {
             data = ((String) data).trim();
@@ -369,8 +351,7 @@ public class DamengValueConverters
         return super.convertInteger(column, fieldDefn, data);
     }
 
-    protected Object convertNumericAsBigInteger(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertNumericAsBigInteger(Column column, Field fieldDefn, Object data) {
         return super.convertBigInt(column, fieldDefn, data);
     }
 
@@ -384,8 +365,7 @@ public class DamengValueConverters
      * @throws IllegalArgumentException if the value could not be converted but the column does not allow nulls
      */
     @Override
-    protected Object convertBoolean(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertBoolean(Column column, Field fieldDefn, Object data) {
         if (data instanceof BigDecimal) {
             return ((BigDecimal) data).byteValue() == 0 ? Boolean.FALSE : Boolean.TRUE;
         }
@@ -396,8 +376,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTinyInt(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTinyInt(Column column, Field fieldDefn, Object data) {
         return convertValue(column, fieldDefn, data, BYTE_FALSE, (r) -> {
             if (data instanceof Byte) {
                 r.deliver(data);
@@ -415,8 +394,7 @@ public class DamengValueConverters
         });
     }
 
-    protected Object convertVariableScale(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertVariableScale(Column column, Field fieldDefn, Object data) {
         data = convertNumeric(column, fieldDefn, data); // provides default value
 
         if (data == null) {
@@ -437,8 +415,7 @@ public class DamengValueConverters
         return handleUnknownData(column, fieldDefn, data);
     }
 
-    protected Object fromOracleTimeClasses(Column column, Object data)
-    {
+    protected Object fromOracleTimeClasses(Column column, Object data) {
         try {
             if (data instanceof DmdbTimestamp) {
                 data = data;
@@ -451,8 +428,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTimestampToEpochMillisAsDate(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTimestampToEpochMillisAsDate(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             data = resolveTimestampStringAsInstant((String) data);
         }
@@ -460,8 +436,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTimestampToEpochMicros(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTimestampToEpochMicros(Column column, Field fieldDefn, Object data) {
         if (data instanceof Long) {
             return data;
         }
@@ -472,8 +447,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTimestampToEpochMillis(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTimestampToEpochMillis(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             data = resolveTimestampStringAsInstant(String.valueOf(data).trim());
         }
@@ -481,16 +455,14 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTimestampToEpochNanos(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTimestampToEpochNanos(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             data = resolveTimestampStringAsInstant((String) data);
         }
         return super.convertTimestampToEpochNanos(column, fieldDefn, fromOracleTimeClasses(column, data));
     }
 
-    private Instant resolveTimestampStringAsInstant(String data)
-    {
+    private Instant resolveTimestampStringAsInstant(String data) {
         LocalDateTime dateTime;
 
         // 处理达梦TIMESTAMP格式的逻辑
@@ -529,8 +501,7 @@ public class DamengValueConverters
     }
 
     @Override
-    protected Object convertTimestampWithZone(Column column, Field fieldDefn, Object data)
-    {
+    protected Object convertTimestampWithZone(Column column, Field fieldDefn, Object data) {
         if (data instanceof String) {
             final Matcher toTimestampTzMatcher = TO_TIMESTAMP_TZ.matcher((String) data);
             if (toTimestampTzMatcher.matches()) {

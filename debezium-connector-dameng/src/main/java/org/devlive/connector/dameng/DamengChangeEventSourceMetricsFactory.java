@@ -16,22 +16,19 @@ import io.debezium.pipeline.spi.Partition;
 /**
  * @author Chris Cranford
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" })
 public class DamengChangeEventSourceMetricsFactory<P extends Partition>
-        extends DefaultChangeEventSourceMetricsFactory<P>
-{
+        extends DefaultChangeEventSourceMetricsFactory<P> {
     private final DamengStreamingChangeEventSourceMetrics streamingMetrics;
 
-    public DamengChangeEventSourceMetricsFactory(DamengStreamingChangeEventSourceMetrics streamingMetrics)
-    {
+    public DamengChangeEventSourceMetricsFactory(DamengStreamingChangeEventSourceMetrics streamingMetrics) {
         this.streamingMetrics = streamingMetrics;
     }
 
     @Override
     public <T extends CdcSourceTaskContext> StreamingChangeEventSourceMetrics<P> getStreamingMetrics(T taskContext,
-            ChangeEventQueueMetrics changeEventQueueMetrics,
-            EventMetadataProvider eventMetadataProvider)
-    {
+                                                                                                     ChangeEventQueueMetrics changeEventQueueMetrics,
+                                                                                                     EventMetadataProvider eventMetadataProvider) {
         return streamingMetrics;
     }
 }

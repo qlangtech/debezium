@@ -6,13 +6,12 @@
 package org.devlive.connector.dameng.logminer.valueholder;
 
 import io.debezium.data.Envelope;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 
 import java.sql.Timestamp;
 import java.util.List;
 
-public interface LogMinerDmlEntry
-{
+public interface LogMinerDmlEntry {
     /**
      * This getter
      *

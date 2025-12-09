@@ -26,29 +26,25 @@ import java.util.Locale;
 /**
  * This is the main Oracle Antlr DDL parser
  */
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "EI_EXPOSE_REP"})
+@SuppressFBWarnings(value = { "EI_EXPOSE_REP2", "EI_EXPOSE_REP" })
 public class OracleDdlParser
-        extends AntlrDdlParser<PlSqlLexer, PlSqlParser>
-{
+        extends AntlrDdlParser<PlSqlLexer, PlSqlParser> {
     private String catalogName;
     private String schemaName;
 
-    public OracleDdlParser()
-    {
+    public OracleDdlParser() {
         super(true);
     }
 
     public OracleDdlParser(
-            boolean throwErrorsFromTreeWalk, final String catalogName, final String schemaName)
-    {
+                           boolean throwErrorsFromTreeWalk, final String catalogName, final String schemaName) {
         super(throwErrorsFromTreeWalk);
         this.catalogName = catalogName;
         this.schemaName = schemaName;
     }
 
     @Override
-    public void parse(String ddlContent, Tables databaseTables)
-    {
+    public void parse(String ddlContent, Tables databaseTables) {
         if (!ddlContent.endsWith(";")) {
             ddlContent = ddlContent + ";";
         }
@@ -56,38 +52,32 @@ public class OracleDdlParser
     }
 
     @Override
-    public ParseTree parseTree(PlSqlParser parser)
-    {
+    public ParseTree parseTree(PlSqlParser parser) {
         return parser.unit_statement();
     }
 
     @Override
-    protected AntlrDdlParserListener createParseTreeWalkerListener()
-    {
+    protected AntlrDdlParserListener createParseTreeWalkerListener() {
         return new OracleDdlParserListener(catalogName, schemaName, this);
     }
 
     @Override
-    protected PlSqlLexer createNewLexerInstance(CharStream charStreams)
-    {
+    protected PlSqlLexer createNewLexerInstance(CharStream charStreams) {
         return new PlSqlLexer(charStreams);
     }
 
     @Override
-    protected PlSqlParser createNewParserInstance(CommonTokenStream commonTokenStream)
-    {
+    protected PlSqlParser createNewParserInstance(CommonTokenStream commonTokenStream) {
         return new PlSqlParser(commonTokenStream);
     }
 
     @Override
-    protected boolean isGrammarInUpperCase()
-    {
+    protected boolean isGrammarInUpperCase() {
         return true;
     }
 
     @Override
-    protected DataTypeResolver initializeDataTypeResolver()
-    {
+    protected DataTypeResolver initializeDataTypeResolver() {
         // todo, register all and use in ColumnDefinitionParserListener
         DataTypeResolver.Builder dataTypeResolverBuilder = new DataTypeResolver.Builder();
 
@@ -119,27 +109,23 @@ public class OracleDdlParser
     }
 
     @Override
-    protected SystemVariables createNewSystemVariablesInstance()
-    {
+    protected SystemVariables createNewSystemVariablesInstance() {
         // todo implement
         return null;
     }
 
     @Override
-    public void setCurrentDatabase(String databaseName)
-    {
+    public void setCurrentDatabase(String databaseName) {
         this.catalogName = databaseName;
     }
 
     @Override
-    public void setCurrentSchema(String schemaName)
-    {
+    public void setCurrentSchema(String schemaName) {
         this.schemaName = schemaName;
     }
 
     @Override
-    public SystemVariables systemVariables()
-    {
+    public SystemVariables systemVariables() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -149,8 +135,7 @@ public class OracleDdlParser
      * @param function function to run; may not be null
      * @param nullableObjects object to be tested, if they are null.
      */
-    public void runIfNotNull(Runnable function, Object... nullableObjects)
-    {
+    public void runIfNotNull(Runnable function, Object... nullableObjects) {
         for (Object nullableObject : nullableObjects) {
             if (nullableObject == null) {
                 return;
@@ -160,8 +145,7 @@ public class OracleDdlParser
     }
 
     // TODO excluded quoted identifiers
-    private String toUpperCase(String ddl)
-    {
+    private String toUpperCase(String ddl) {
         return ddl.toUpperCase(Locale.ENGLISH);
     }
 }

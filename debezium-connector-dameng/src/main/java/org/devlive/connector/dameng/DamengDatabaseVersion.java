@@ -13,8 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author Chris Cranford
  */
-public class DamengDatabaseVersion
-{
+public class DamengDatabaseVersion {
     private static final Pattern VERSION_PATTERN = Pattern
             .compile("(?:.*)(?:Release )([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:.*)");
     private static final Pattern VERSION_18_1_PATTERN = Pattern
@@ -27,8 +26,7 @@ public class DamengDatabaseVersion
     private final int platform;
     private final String banner;
 
-    private DamengDatabaseVersion(int major, int maintenance, int appServer, int component, int platform, String banner)
-    {
+    private DamengDatabaseVersion(int major, int maintenance, int appServer, int component, int platform, String banner) {
         this.major = major;
         this.maintenance = maintenance;
         this.appServer = appServer;
@@ -44,8 +42,7 @@ public class DamengDatabaseVersion
      * @return the parsed OracleDatabaseVersion.
      * @throws RuntimeException if the version banner string cannot be parsed
      */
-    public static DamengDatabaseVersion parse(String banner)
-    {
+    public static DamengDatabaseVersion parse(String banner) {
         banner = "Oracle Database 18g Enterprise Edition Release 18.2.0.1.0 - 64bit Production";
         Matcher matcher = VERSION_18_1_PATTERN.matcher(banner);
         if (!matcher.matches()) {
@@ -64,39 +61,32 @@ public class DamengDatabaseVersion
         return new DamengDatabaseVersion(major, maintenance, app, component, platform, banner);
     }
 
-    public int getMajor()
-    {
+    public int getMajor() {
         return major;
     }
 
-    public int getMaintenance()
-    {
+    public int getMaintenance() {
         return maintenance;
     }
 
-    public int getAppServer()
-    {
+    public int getAppServer() {
         return appServer;
     }
 
-    public int getComponent()
-    {
+    public int getComponent() {
         return component;
     }
 
-    public int getPlatform()
-    {
+    public int getPlatform() {
         return platform;
     }
 
-    public String getBanner()
-    {
+    public String getBanner() {
         return banner;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return major + "." + maintenance + "." + appServer + "." + component + "." + platform;
     }
 }

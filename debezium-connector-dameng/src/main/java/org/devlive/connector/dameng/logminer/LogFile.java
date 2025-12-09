@@ -5,7 +5,7 @@
  */
 package org.devlive.connector.dameng.logminer;
 
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 
 import java.util.Objects;
 
@@ -14,8 +14,7 @@ import java.util.Objects;
  *
  * @author Chris Cranford
  */
-public class LogFile
-{
+public class LogFile {
     private final String fileName;
     private final Scn firstScn;
     private final Scn nextScn;
@@ -28,8 +27,7 @@ public class LogFile
      * @param firstScn the first system change number in the log
      * @param nextScn the first system change number in the following log
      */
-    public LogFile(String fileName, Scn firstScn, Scn nextScn)
-    {
+    public LogFile(String fileName, Scn firstScn, Scn nextScn) {
         this(fileName, firstScn, nextScn, false);
     }
 
@@ -41,34 +39,29 @@ public class LogFile
      * @param nextScn the first system change number in the following log
      * @param current whether the log file is the current one
      */
-    public LogFile(String fileName, Scn firstScn, Scn nextScn, boolean current)
-    {
+    public LogFile(String fileName, Scn firstScn, Scn nextScn, boolean current) {
         this.fileName = fileName;
         this.firstScn = firstScn;
         this.nextScn = nextScn;
         this.current = current;
     }
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return fileName;
     }
 
-    public Scn getFirstScn()
-    {
+    public Scn getFirstScn() {
         return firstScn;
     }
 
-    public Scn getNextScn()
-    {
+    public Scn getNextScn() {
         return isCurrent() ? Scn.MAX : nextScn;
     }
 
     /**
      * Returns whether this log file instance is considered the current online redo log record.
      */
-    public boolean isCurrent()
-    {
+    public boolean isCurrent() {
         return current;
     }
 
@@ -78,20 +71,17 @@ public class LogFile
      * @param other the other log file instance
      * @return true if both have the same SCN range; otherwise false
      */
-    public boolean isSameRange(LogFile other)
-    {
+    public boolean isSameRange(LogFile other) {
         return Objects.equals(firstScn, other.getFirstScn()) && Objects.equals(nextScn, other.getNextScn());
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(firstScn, nextScn);
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }

@@ -12,10 +12,8 @@ import io.debezium.ddl.parser.oracle.generated.PlSqlParserBaseListener;
  * This class contains common methods for all listeners
  */
 class BaseParserListener
-        extends PlSqlParserBaseListener
-{
-    String getTableName(final PlSqlParser.Tableview_nameContext tableviewName)
-    {
+        extends PlSqlParserBaseListener {
+    String getTableName(final PlSqlParser.Tableview_nameContext tableviewName) {
         if (tableviewName.id_expression() != null) {
             return tableviewName.id_expression().getText();
         }
@@ -24,8 +22,7 @@ class BaseParserListener
         }
     }
 
-    String getColumnName(final PlSqlParser.Column_nameContext ctx)
-    {
+    String getColumnName(final PlSqlParser.Column_nameContext ctx) {
         return ctx.identifier().id_expression().getText();
     }
 }

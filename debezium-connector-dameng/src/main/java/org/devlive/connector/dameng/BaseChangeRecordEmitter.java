@@ -16,12 +16,10 @@ import io.debezium.util.Clock;
  * Base class to emit change data based on a single entry event.
  */
 public abstract class BaseChangeRecordEmitter<T, P extends Partition>
-        extends RelationalChangeRecordEmitter<P>
-{
+        extends RelationalChangeRecordEmitter<P> {
     protected final Table table;
 
-    protected BaseChangeRecordEmitter(P partition, OffsetContext offset, Table table, Clock clock)
-    {
+    protected BaseChangeRecordEmitter(P partition, OffsetContext offset, Table table, Clock clock) {
         super(partition, offset, clock);
         this.table = table;
     }
@@ -32,8 +30,7 @@ public abstract class BaseChangeRecordEmitter<T, P extends Partition>
 
     protected abstract Object getColumnData(T columnValue);
 
-    protected Object[] getColumnValues(T[] columnValues)
-    {
+    protected Object[] getColumnValues(T[] columnValues) {
         Object[] values = new Object[table.columns().size()];
 
         for (T columnValue : columnValues) {

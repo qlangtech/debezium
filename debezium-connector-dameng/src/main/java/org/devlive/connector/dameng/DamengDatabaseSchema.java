@@ -26,13 +26,11 @@ import org.slf4j.LoggerFactory;
  * @author Gunnar Morling
  */
 public class DamengDatabaseSchema
-        extends HistorizedRelationalDatabaseSchema
-{
+        extends HistorizedRelationalDatabaseSchema {
     private static final Logger LOGGER = LoggerFactory.getLogger(DamengDatabaseSchema.class);
 
     public DamengDatabaseSchema(DamengConnectorConfig connectorConfig, SchemaNameAdjuster schemaNameAdjuster, TopicSelector<TableId> topicSelector,
-            DamengConnection connection)
-    {
+                                DamengConnection connection) {
         super(connectorConfig, topicSelector, connectorConfig.getTableFilters().dataCollectionFilter(), connectorConfig.getColumnFilter(),
                 new TableSchemaBuilder(
                         new DamengValueConverters(connectorConfig, connection),
@@ -40,26 +38,22 @@ public class DamengDatabaseSchema
                         connectorConfig.customConverterRegistry(),
                         connectorConfig.getSourceInfoStructMaker().schema(),
                         connectorConfig.getSanitizeFieldNames(),
-                        false
-                ),
+                        false),
                 connection.getTablenameCaseInsensitivity(connectorConfig),
                 connectorConfig.getKeyMapper());
     }
 
-    public Tables getTables()
-    {
+    public Tables getTables() {
         return tables();
     }
 
     @Override
-    protected DdlParser getDdlParser()
-    {
+    protected DdlParser getDdlParser() {
         return new OracleDdlParser();
     }
 
     @Override
-    public void applySchemaChange(SchemaChangeEvent schemaChange)
-    {
+    public void applySchemaChange(SchemaChangeEvent schemaChange) {
         LOGGER.debug("Applying schema change event {}", schemaChange);
 
         // just a single table per DDL event for Oracle

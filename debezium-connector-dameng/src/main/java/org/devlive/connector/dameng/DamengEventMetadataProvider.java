@@ -16,11 +16,9 @@ import java.time.Instant;
 import java.util.Map;
 
 class DamengEventMetadataProvider
-        implements EventMetadataProvider
-{
+        implements EventMetadataProvider {
     @Override
-    public Instant getEventTimestamp(DataCollectionId source, OffsetContext offset, Object key, Struct value)
-    {
+    public Instant getEventTimestamp(DataCollectionId source, OffsetContext offset, Object key, Struct value) {
         if (value == null) {
             return null;
         }
@@ -33,8 +31,7 @@ class DamengEventMetadataProvider
     }
 
     @Override
-    public Map<String, String> getEventSourcePosition(DataCollectionId source, OffsetContext offset, Object key, Struct value)
-    {
+    public Map<String, String> getEventSourcePosition(DataCollectionId source, OffsetContext offset, Object key, Struct value) {
         if (value == null) {
             return null;
         }
@@ -47,8 +44,7 @@ class DamengEventMetadataProvider
     }
 
     @Override
-    public String getTransactionId(DataCollectionId source, OffsetContext offset, Object key, Struct value)
-    {
+    public String getTransactionId(DataCollectionId source, OffsetContext offset, Object key, Struct value) {
         if (value == null) {
             return null;
         }

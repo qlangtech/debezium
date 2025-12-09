@@ -13,27 +13,23 @@ import java.util.Objects;
  * This class stores parsed column info
  */
 public class LogMinerColumnValueImpl
-        implements LogMinerColumnValue
-{
+        implements LogMinerColumnValue {
     private final String columnName;
     private final int columnType;
     private Object columnData;
 
-    public LogMinerColumnValueImpl(String columnName, int columnType)
-    {
+    public LogMinerColumnValueImpl(String columnName, int columnType) {
         this.columnName = columnName;
         this.columnType = columnType;
     }
 
     @Override
-    public Object getColumnData()
-    {
+    public Object getColumnData() {
         return columnData;
     }
 
     @Override
-    public void setColumnData(Object columnData)
-    {
+    public void setColumnData(Object columnData) {
         if (columnData instanceof String) {
             this.columnData = ParserUtils.replaceDoubleBackSlashes((String) columnData);
         }
@@ -43,14 +39,12 @@ public class LogMinerColumnValueImpl
     }
 
     @Override
-    public String getColumnName()
-    {
+    public String getColumnName() {
         return columnName;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -64,8 +58,7 @@ public class LogMinerColumnValueImpl
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(columnName, columnData, columnType);
     }
 }

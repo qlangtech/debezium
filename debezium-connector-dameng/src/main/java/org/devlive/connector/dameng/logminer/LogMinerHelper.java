@@ -16,7 +16,7 @@ import org.devlive.connector.dameng.DamengConnection;
 import org.devlive.connector.dameng.DamengConnectorConfig;
 import org.devlive.connector.dameng.DamengDatabaseSchema;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +47,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class contains methods to configure and manage LogMiner utility
  */
-public class LogMinerHelper
-{
+public class LogMinerHelper {
     private static final String CURRENT = "CURRENT";
     private static final String UNKNOWN = "unknown";
     private static final String TOTAL = "TOTAL";
@@ -56,10 +55,10 @@ public class LogMinerHelper
     private static final Logger LOGGER = LoggerFactory.getLogger(LogMinerHelper.class);
     private static Map<String, DamengConnection> racFlushConnections = new HashMap<>();
 
-    private LogMinerHelper() {}
+    private LogMinerHelper() {
+    }
 
-    static void instantiateFlushConnections(JdbcConfiguration config, Set<String> hosts)
-    {
+    static void instantiateFlushConnections(JdbcConfiguration config, Set<String> hosts) {
         for (DamengConnection conn : racFlushConnections.values()) {
             if (conn != null) {
                 try {
@@ -91,8 +90,7 @@ public class LogMinerHelper
      * @throws SQLException any exception
      */
     static void buildDataDictionary(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         LOGGER.trace("Building data dictionary");
         executeCallableStatement(connection, SqlUtils.BUILD_DICTIONARY);
     }
@@ -105,8 +103,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     public static Scn getCurrentScn(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         try (Statement statement = connection.connection(false).createStatement();
                 ResultSet rs = statement.executeQuery(SqlUtils.currentScnQuery())) {
             if (!rs.next()) {
@@ -118,8 +115,7 @@ public class LogMinerHelper
     }
 
     static void createFlushTable(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         String tableExists = (String) getSingleResult(connection, SqlUtils.tableExistsQuery(SqlUtils.LOGMNR_FLUSH_TABLE), DATATYPE.STRING);
         if (tableExists == null) {
             executeCallableStatement(connection, SqlUtils.CREATE_FLUSH_TABLE);
@@ -146,8 +142,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static Scn getEndScn(DamengConnection connection, Scn startScn, DamengStreamingChangeEventSourceMetrics streamingMetrics, int defaultBatchSize)
-            throws SQLException
-    {
+            throws SQLException {
         Scn currentScn = getCurrentScn(connection);
         streamingMetrics.setCurrentScn(currentScn);
         Scn topScnToMine = startScn.add(Scn.valueOf(streamingMetrics.getBatchSize()));
@@ -185,9 +180,8 @@ public class LogMinerHelper
      * @throws SQLException exception
      */
     static void flushLogWriter(DamengConnection connection, JdbcConfiguration config,
-            boolean isRac, Set<String> racHosts)
-            throws SQLException
-    {
+                               boolean isRac, Set<String> racHosts)
+            throws SQLException {
         Scn currentScn = getCurrentScn(connection);
         if (isRac) {
             flushRacLogWriters(currentScn, config, racHosts);
@@ -206,8 +200,7 @@ public class LogMinerHelper
      * @return the database system time
      */
     static OffsetDateTime getSystime(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         return connection.queryAndMap(SqlUtils.SELECT_SYSTIMESTAMP, rs -> {
             if (rs.next()) {
                 long timeStamp2 = rs.getTimestamp(1).getTime();
@@ -238,9 +231,8 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static void startLogMining(DamengConnection connection, Scn startScn, Scn endScn,
-            DamengConnectorConfig.LogMiningStrategy strategy, boolean isContinuousMining, DamengStreamingChangeEventSourceMetrics streamingMetrics)
-            throws SQLException
-    {
+                               DamengConnectorConfig.LogMiningStrategy strategy, boolean isContinuousMining, DamengStreamingChangeEventSourceMetrics streamingMetrics)
+            throws SQLException {
         LOGGER.trace("Starting log mining startScn={}, endScn={}, strategy={}, continuous={}", startScn, endScn, strategy, isContinuousMining);
 
         String statement = SqlUtils.startLogMinerStatement(startScn, endScn, strategy, isContinuousMining);
@@ -266,8 +258,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static Set<String> getCurrentRedoLogFiles(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         final Set<String> fileNames = new HashSet<>();
 
         connection.query("SELECT PATH FROM V$ARCH_FILE WHERE STATUS = 'ACTIVE'", rs -> {
@@ -289,12 +280,16 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static Scn getFirstOnlineLogScn(DamengConnection connection, Duration archiveLogRetention)
-            throws SQLException
-    {
+            throws SQLException {
         LOGGER.trace("Getting first scn of all online logs");
         try (Statement s = connection.connection(false).createStatement()) {
             try (ResultSet rs = s.executeQuery(SqlUtils.oldestFirstChangeQuery(archiveLogRetention))) {
-                rs.next();
+                if (!rs.next()) {
+                    // No archived logs found, return SCN 0 as fallback
+                    LOGGER.warn(
+                            "No archived logs found in V$ARCH_FILE, returning SCN 0 as fallback. This is normal for test environments or databases without archived logs.");
+                    return Scn.valueOf(0L);
+                }
                 Scn firstScnOfOnlineLog = Scn.valueOf(rs.getString(1));
                 LOGGER.trace("First SCN in online logs is {}", firstScnOfOnlineLog);
                 return firstScnOfOnlineLog;
@@ -309,8 +304,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static void setNlsSessionParameters(JdbcConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         connection.executeWithoutCommitting(SqlUtils.NLS_SESSION_PARAMETERS);
         // This is necessary so that TIMESTAMP WITH LOCAL TIME ZONE get returned in UTC
         connection.executeWithoutCommitting("ALTER SESSION SET TIME_ZONE = '00:00'");
@@ -324,8 +318,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     private static Map<String, String> getRedoLogStatus(DamengConnection connection)
-            throws SQLException
-    {
+            throws SQLException {
         return getMap(connection, SqlUtils.redoLogStatusQuery(), UNKNOWN);
     }
 
@@ -335,8 +328,7 @@ public class LogMinerHelper
      * @param connection privileged connection
      * @return counter
      */
-    private static int getSwitchCount(DamengConnection connection)
-    {
+    private static int getSwitchCount(DamengConnection connection) {
         try {
             Map<String, String> total = getMap(connection, SqlUtils.switchHistoryQuery(), UNKNOWN);
             if (total != null && total.get(TOTAL) != null) {
@@ -355,8 +347,7 @@ public class LogMinerHelper
      * We also cannot rely on connection factory, because it may return connection to the same instance multiple times
      * Instead we are asking node ip list from configuration
      */
-    private static void flushRacLogWriters(Scn currentScn, JdbcConfiguration config, Set<String> racHosts)
-    {
+    private static void flushRacLogWriters(Scn currentScn, JdbcConfiguration config, Set<String> racHosts) {
         Instant startTime = Instant.now();
         if (racHosts.isEmpty()) {
             throw new RuntimeException("No RAC node ip addresses were supplied in the configuration");
@@ -399,8 +390,7 @@ public class LogMinerHelper
 
     // todo use pool
     private static DamengConnection createFlushConnection(JdbcConfiguration config, String host)
-            throws SQLException
-    {
+            throws SQLException {
         JdbcConfiguration hostConfig = JdbcConfiguration.adapt(config.edit().with(JdbcConfiguration.DATABASE, host).build());
         DamengConnection connection = new DamengConnection(hostConfig, () -> LogMinerHelper.class.getClassLoader());
         connection.setAutoCommit(false);
@@ -416,8 +406,7 @@ public class LogMinerHelper
      * @throws SQLException if anything unexpected happens
      */
     static void checkSupplementalLogging(DamengConnection connection, String pdbName, DamengDatabaseSchema schema)
-            throws SQLException
-    {
+            throws SQLException {
         try {
             if (pdbName != null) {
                 connection.setSessionToPdb(pdbName);
@@ -449,8 +438,7 @@ public class LogMinerHelper
     }
 
     static boolean isTableSupplementalLogDataAll(DamengConnection connection, TableId tableId)
-            throws SQLException
-    {
+            throws SQLException {
         return connection.queryAndMap(SqlUtils.tableSupplementalLoggingCheckQuery(tableId), (rs) -> {
             while (rs.next()) {
                 if (ALL_COLUMN_LOGGING.equals(rs.getString(2))) {
@@ -467,8 +455,7 @@ public class LogMinerHelper
      *
      * @param connection container level database connection
      */
-    public static void endMining(DamengConnection connection)
-    {
+    public static void endMining(DamengConnection connection) {
         String stopMining = SqlUtils.END_LOGMNR;
         try {
             executeCallableStatement(connection, stopMining);
@@ -493,8 +480,7 @@ public class LogMinerHelper
      */
     // todo: check RAC resiliency
     public static void setRedoLogFilesForMining(DamengConnection connection, Scn lastProcessedScn, Duration archiveLogRetention)
-            throws SQLException
-    {
+            throws SQLException {
         removeLogFilesFromMining(connection);
 
         List<LogFile> onlineLogFilesForMining = getOnlineLogFilesForOffsetScn(connection, lastProcessedScn);
@@ -538,8 +524,7 @@ public class LogMinerHelper
      * @throws SQLException
      */
     public static void setDamengRedoLogFilesForMining(DamengConnection connection, Scn lastProcessedScn, Duration archiveLogRetention)
-            throws SQLException
-    {
+            throws SQLException {
         List<LogFile> onlineLogFilesForMining = getOnlineLogFilesForOffsetScn(connection, lastProcessedScn);
         // List<LogFile> archivedLogFilesForMining = getArchivedLogFilesForOffsetScn(connection, lastProcessedScn, archiveLogRetention);
         //
@@ -579,8 +564,7 @@ public class LogMinerHelper
      * @param transactionRetention duration to tolerate long running transactions
      * @return optional SCN as a watermark for abandonment
      */
-    public static Optional<Scn> getLastScnToAbandon(DamengConnection connection, Scn offsetScn, Duration transactionRetention)
-    {
+    public static Optional<Scn> getLastScnToAbandon(DamengConnection connection, Scn offsetScn, Duration transactionRetention) {
         try {
             String query = SqlUtils.diffInDaysQuery(offsetScn);
             Float diffInDays = (Float) getSingleResult(connection, query, DATATYPE.FLOAT);
@@ -595,14 +579,12 @@ public class LogMinerHelper
         }
     }
 
-    static void logWarn(DamengStreamingChangeEventSourceMetrics streamingMetrics, String format, Object... args)
-    {
+    static void logWarn(DamengStreamingChangeEventSourceMetrics streamingMetrics, String format, Object... args) {
         LOGGER.warn(format, args);
         streamingMetrics.incrementWarningCount();
     }
 
-    static void logError(DamengStreamingChangeEventSourceMetrics streamingMetrics, String format, Object... args)
-    {
+    static void logError(DamengStreamingChangeEventSourceMetrics streamingMetrics, String format, Object... args) {
         LOGGER.error(format, args);
         streamingMetrics.incrementErrorCount();
     }
@@ -612,8 +594,7 @@ public class LogMinerHelper
      * 18446744073709551615 on Ora 19c is the max value of the nextScn in the current redo
      */
     public static List<LogFile> getOnlineLogFilesForOffsetScn(DamengConnection connection, Scn offsetScn)
-            throws SQLException
-    {
+            throws SQLException {
         LOGGER.trace("Getting online redo logs for offset scn {}", offsetScn);
         List<LogFile> redoLogFiles = new ArrayList<>();
 
@@ -640,8 +621,7 @@ public class LogMinerHelper
         return redoLogFiles;
     }
 
-    private static Scn getScnFromString(String value)
-    {
+    private static Scn getScnFromString(String value) {
         if (Strings.isNullOrEmpty(value)) {
             return Scn.MAX;
         }
@@ -654,8 +634,7 @@ public class LogMinerHelper
      *
      * @param connection the database connection
      */
-    private static void logDatabaseState(DamengConnection connection)
-    {
+    private static void logDatabaseState(DamengConnection connection) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Available archive logs are:");
             try {
@@ -690,8 +669,7 @@ public class LogMinerHelper
      * @throws SQLException thrown if an exception occurs performing a SQL operation
      */
     private static void logQueryResults(DamengConnection connection, String query)
-            throws SQLException
-    {
+            throws SQLException {
         connection.query(query, rs -> {
             int columns = rs.getMetaData().getColumnCount();
             List<String> columnNames = new ArrayList<>();
@@ -719,8 +697,7 @@ public class LogMinerHelper
      * @throws SQLException if something happens
      */
     public static List<LogFile> getArchivedLogFilesForOffsetScn(DamengConnection connection, Scn offsetScn, Duration archiveLogRetention)
-            throws SQLException
-    {
+            throws SQLException {
         final List<LogFile> archiveLogFiles = new ArrayList<>();
         // try (PreparedStatement s = connection.connection(false).prepareStatement(SqlUtils.archiveLogsQuery(offsetScn, archiveLogRetention))) {
         try (PreparedStatement s = connection.connection(false).prepareStatement("SELECT * FROM V$LOGMNR_LOGS")) {
@@ -746,8 +723,7 @@ public class LogMinerHelper
      * @throws SQLException something happened
      */
     public static void removeLogFilesFromMining(DamengConnection conn)
-            throws SQLException
-    {
+            throws SQLException {
         try (PreparedStatement ps = conn.connection(false).prepareStatement(SqlUtils.FILES_FOR_MINING);
                 ResultSet result = ps.executeQuery()) {
             Set<String> files = new LinkedHashSet<>();
@@ -762,8 +738,7 @@ public class LogMinerHelper
     }
 
     private static void executeCallableStatement(DamengConnection connection, String statement)
-            throws SQLException
-    {
+            throws SQLException {
         requireNonNull(statement);
         LOGGER.debug("Before executing statement: {}", statement);
         try (CallableStatement s = connection.connection(false).prepareCall(statement)) {
@@ -781,8 +756,7 @@ public class LogMinerHelper
     }
 
     public static Map<String, String> getMap(DamengConnection connection, String query, String nullReplacement)
-            throws SQLException
-    {
+            throws SQLException {
         Map<String, String> result = new LinkedHashMap<>();
         try (
                 PreparedStatement statement = connection.connection(false).prepareStatement(query);
@@ -797,8 +771,7 @@ public class LogMinerHelper
     }
 
     public static Object getSingleResult(DamengConnection connection, String query, DATATYPE type)
-            throws SQLException
-    {
+            throws SQLException {
         try (PreparedStatement statement = connection.connection(false).prepareStatement(query);
                 ResultSet rs = statement.executeQuery()) {
             if (rs.next()) {
@@ -817,8 +790,7 @@ public class LogMinerHelper
         }
     }
 
-    public enum DATATYPE
-    {
+    public enum DATATYPE {
         LONG,
         TIMESTAMP,
         STRING,

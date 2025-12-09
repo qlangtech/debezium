@@ -20,7 +20,7 @@ import org.devlive.connector.dameng.DamengOffsetContext;
 import org.devlive.connector.dameng.DamengStreamingChangeEventSourceMetrics;
 import org.devlive.connector.dameng.DamengValueConverters;
 import org.devlive.connector.dameng.MapBackedPartition;
-import io.debezium.connector.oracle.Scn;
+import org.devlive.connector.dameng.Scn;
 import org.devlive.connector.dameng.logminer.parser.DmlParser;
 import org.devlive.connector.dameng.logminer.parser.DmlParserException;
 import org.devlive.connector.dameng.logminer.parser.LogMinerDmlParser;
@@ -44,8 +44,7 @@ import java.time.Instant;
  * This also calculates metrics
  */
 @SuppressFBWarnings(value = "SF_SWITCH_NO_DEFAULT")
-class LogMinerQueryResultProcessor
-{
+class LogMinerQueryResultProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogMinerQueryResultProcessor.class);
 
     private final ChangeEventSourceContext context;
@@ -64,18 +63,16 @@ class LogMinerQueryResultProcessor
     private long stuckScnCounter = 0;
 
     LogMinerQueryResultProcessor(
-            ChangeEventSourceContext context,
-            DamengConnection jdbcConnection,
-            DamengConnectorConfig connectorConfig,
-            DamengStreamingChangeEventSourceMetrics streamingMetrics,
-            TransactionalBuffer transactionalBuffer,
-            DamengOffsetContext offsetContext,
-            DamengDatabaseSchema schema,
-            EventDispatcher<MapBackedPartition, TableId> dispatcher,
-            Clock clock,
-            HistoryRecorder historyRecorder
-    )
-    {
+                                 ChangeEventSourceContext context,
+                                 DamengConnection jdbcConnection,
+                                 DamengConnectorConfig connectorConfig,
+                                 DamengStreamingChangeEventSourceMetrics streamingMetrics,
+                                 TransactionalBuffer transactionalBuffer,
+                                 DamengOffsetContext offsetContext,
+                                 DamengDatabaseSchema schema,
+                                 EventDispatcher<MapBackedPartition, TableId> dispatcher,
+                                 Clock clock,
+                                 HistoryRecorder historyRecorder) {
         this.context = context;
         this.streamingMetrics = streamingMetrics;
         this.transactionalBuffer = transactionalBuffer;
@@ -88,8 +85,7 @@ class LogMinerQueryResultProcessor
         this.dmlParser = resolveParser(connectorConfig, jdbcConnection);
     }
 
-    private static DmlParser resolveParser(DamengConnectorConfig connectorConfig, DamengConnection connection)
-    {
+    private static DmlParser resolveParser(DamengConnectorConfig connectorConfig, DamengConnection connection) {
         if (connectorConfig.getLogMiningDmlParser().equals(LogMiningDmlParser.LEGACY)) {
             DamengValueConverters converter = new DamengValueConverters(connectorConfig, connection);
             return new SimpleDmlParser(connectorConfig.getCatalogName(), converter);
@@ -105,8 +101,7 @@ class LogMinerQueryResultProcessor
      * @throws SQLException thrown if any database exception occurs
      */
     void processResult(ResultSet resultSet)
-            throws SQLException
-    {
+            throws SQLException {
         int dmlCounter = 0;
         int insertCounter = 0;
         int updateCounter = 0;
@@ -244,7 +239,7 @@ class LogMinerQueryResultProcessor
         }
 
         LOGGER.debug("{} Rows, {} DMLs, {} Commits, {} Rollbacks, {} Inserts, {} Updates, {} Deletes. Processed in {} millis. " +
-                        "Lag:{}. Offset scn:{}. Offset commit scn:{}. Active transactions:{}. Sleep time:{}",
+                "Lag:{}. Offset scn:{}. Offset commit scn:{}. Active transactions:{}. Sleep time:{}",
                 rows, dmlCounter, commitCounter, rollbackCounter, insertCounter, updateCounter, deleteCounter, totalTime.toMillis(),
                 streamingMetrics.getLagFromSourceInMilliseconds(), offsetContext.getScn(), offsetContext.getCommitScn(),
                 streamingMetrics.getNumberOfActiveTransactions(), streamingMetrics.getMillisecondToSleepBetweenMiningQuery());
@@ -256,8 +251,7 @@ class LogMinerQueryResultProcessor
     }
 
     private boolean hasNext(ResultSet resultSet)
-            throws SQLException
-    {
+            throws SQLException {
         Instant rsNextStart = Instant.now();
         if (resultSet.next()) {
             streamingMetrics.addCurrentResultSetNext(Duration.between(rsNextStart, Instant.now()));
@@ -270,8 +264,7 @@ class LogMinerQueryResultProcessor
      * This method is warning if a long running transaction is discovered and could be abandoned in the future.
      * The criteria is the offset SCN remains the same in 25 mining cycles
      */
-    private void warnStuckScn()
-    {
+    private void warnStuckScn() {
         if (offsetContext != null && offsetContext.getCommitScn() != null) {
             final Scn scn = offsetContext.getScn();
             final Scn commitScn = offsetContext.getCommitScn();
@@ -292,8 +285,7 @@ class LogMinerQueryResultProcessor
         }
     }
 
-    private LogMinerDmlEntry parse(String redoSql, Table table, String txId)
-    {
+    private LogMinerDmlEntry parse(String redoSql, Table table, String txId) {
         LogMinerDmlEntry dmlEntry;
         try {
             Instant parseStart = Instant.now();

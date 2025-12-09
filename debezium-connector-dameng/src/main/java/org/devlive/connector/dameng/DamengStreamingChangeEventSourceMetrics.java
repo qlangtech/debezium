@@ -10,7 +10,6 @@ import io.debezium.annotation.ThreadSafe;
 import io.debezium.annotation.VisibleForTesting;
 import io.debezium.connector.base.ChangeEventQueueMetrics;
 import io.debezium.connector.common.CdcSourceTaskContext;
-import io.debezium.connector.oracle.Scn;
 import io.debezium.data.Envelope;
 import io.debezium.pipeline.ConnectorEvent;
 import io.debezium.pipeline.metrics.StreamingChangeEventSourceMetrics;
@@ -39,8 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public class DamengStreamingChangeEventSourceMetrics
-        implements StreamingChangeEventSourceMetrics, DamengStreamingChangeEventSourceMetricsMXBean
-{
+        implements StreamingChangeEventSourceMetrics, DamengStreamingChangeEventSourceMetricsMXBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(DamengStreamingChangeEventSourceMetrics.class);
 
     private static final long MILLIS_PER_SECOND = 1000L;
@@ -116,9 +114,8 @@ public class DamengStreamingChangeEventSourceMetrics
     private final Clock clock;
 
     public DamengStreamingChangeEventSourceMetrics(CdcSourceTaskContext taskContext, ChangeEventQueueMetrics changeEventQueueMetrics,
-            EventMetadataProvider metadataProvider,
-            DamengConnectorConfig connectorConfig)
-    {
+                                                   EventMetadataProvider metadataProvider,
+                                                   DamengConnectorConfig connectorConfig) {
         this(taskContext, changeEventQueueMetrics, metadataProvider, connectorConfig, Clock.systemUTC());
     }
 
@@ -127,10 +124,9 @@ public class DamengStreamingChangeEventSourceMetrics
      */
     @VisibleForTesting
     DamengStreamingChangeEventSourceMetrics(CdcSourceTaskContext taskContext, ChangeEventQueueMetrics changeEventQueueMetrics,
-            EventMetadataProvider metadataProvider,
-            DamengConnectorConfig connectorConfig,
-            Clock clock)
-    {
+                                            EventMetadataProvider metadataProvider,
+                                            DamengConnectorConfig connectorConfig,
+                                            Clock clock) {
         this.clock = clock;
         startTime = clock.instant();
         timeDifference.set(0L);
@@ -163,14 +159,12 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public String[] getMonitoredTables()
-    {
+    public String[] getMonitoredTables() {
         return new String[0];
     }
 
     @Override
-    public void reset()
-    {
+    public void reset() {
         batchSize.set(batchSizeDefault);
         millisecondToSleepBetweenMiningQuery.set(sleepTimeDefault);
         totalCapturedDmlCount.set(0);
@@ -213,8 +207,7 @@ public class DamengStreamingChangeEventSourceMetrics
         scnFreezeCount.set(0);
     }
 
-    public void setCurrentLogFileName(Set<String> names)
-    {
+    public void setCurrentLogFileName(Set<String> names) {
         currentLogFileName.set(names.stream().toArray(String[]::new));
         if (names.size() < minimumLogsMined.get()) {
             minimumLogsMined.set(names.size());
@@ -225,24 +218,20 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public long getMinimumMinedLogCount()
-    {
+    public long getMinimumMinedLogCount() {
         return minimumLogsMined.get();
     }
 
     @Override
-    public long getMaximumMinedLogCount()
-    {
+    public long getMaximumMinedLogCount() {
         return maximumLogsMined.get();
     }
 
-    public void setSwitchCount(int counter)
-    {
+    public void setSwitchCount(int counter) {
         switchCounter.set(counter);
     }
 
-    public void setLastDurationOfBatchCapturing(Duration lastDuration)
-    {
+    public void setLastDurationOfBatchCapturing(Duration lastDuration) {
         lastDurationOfFetchingQuery.set(lastDuration);
         totalDurationOfFetchingQuery.accumulateAndGet(lastDurationOfFetchingQuery.get(), Duration::plus);
         if (maxDurationOfFetchingQuery.get().toMillis() < lastDurationOfFetchingQuery.get().toMillis()) {
@@ -251,8 +240,7 @@ public class DamengStreamingChangeEventSourceMetrics
         logMinerQueryCount.incrementAndGet();
     }
 
-    public void setLastDurationOfBatchProcessing(Duration lastDuration)
-    {
+    public void setLastDurationOfBatchProcessing(Duration lastDuration) {
         lastBatchProcessingDuration.set(lastDuration);
         totalBatchProcessingDuration.accumulateAndGet(lastDuration, Duration::plus);
         if (maxBatchProcessingDuration.get().toMillis() < lastDuration.toMillis()) {
@@ -263,84 +251,70 @@ public class DamengStreamingChangeEventSourceMetrics
         }
     }
 
-    public void incrementNetworkConnectionProblemsCounter()
-    {
+    public void incrementNetworkConnectionProblemsCounter() {
         networkConnectionProblemsCounter.incrementAndGet();
     }
 
     @Override
-    public String getCurrentScn()
-    {
+    public String getCurrentScn() {
         return currentScn.get().toString();
     }
 
-    public void setCurrentScn(Scn scn)
-    {
+    public void setCurrentScn(Scn scn) {
         currentScn.set(scn);
     }
 
     @Override
-    public long getTotalCapturedDmlCount()
-    {
+    public long getTotalCapturedDmlCount() {
         return totalCapturedDmlCount.get();
     }
 
     @Override
-    public String[] getCurrentRedoLogFileName()
-    {
+    public String[] getCurrentRedoLogFileName() {
         return currentLogFileName.get();
     }
 
     @Override
-    public String[] getRedoLogStatus()
-    {
+    public String[] getRedoLogStatus() {
         return redoLogStatus.get();
     }
 
-    public void setRedoLogStatus(Map<String, String> status)
-    {
+    public void setRedoLogStatus(Map<String, String> status) {
         String[] statusArray = status.entrySet().stream().map(e -> e.getKey() + " | " + e.getValue()).toArray(String[]::new);
         redoLogStatus.set(statusArray);
     }
 
     @Override
-    public int getSwitchCounter()
-    {
+    public int getSwitchCounter() {
         return switchCounter.get();
     }
 
     @Override
-    public Long getLastDurationOfFetchQueryInMilliseconds()
-    {
+    public Long getLastDurationOfFetchQueryInMilliseconds() {
         return lastDurationOfFetchingQuery.get() == null ? 0 : lastDurationOfFetchingQuery.get().toMillis();
     }
 
     @Override
-    public long getLastBatchProcessingTimeInMilliseconds()
-    {
+    public long getLastBatchProcessingTimeInMilliseconds() {
         return lastBatchProcessingDuration.get().toMillis();
     }
 
     @Override
-    public Long getMaxDurationOfFetchQueryInMilliseconds()
-    {
+    public Long getMaxDurationOfFetchQueryInMilliseconds() {
         return maxDurationOfFetchingQuery.get() == null ? 0 : maxDurationOfFetchingQuery.get().toMillis();
     }
 
     @Override
-    public Long getMaxCapturedDmlInBatch()
-    {
+    public Long getMaxCapturedDmlInBatch() {
         return maxCapturedDmlCount.get();
     }
 
     @Override
-    public int getLastCapturedDmlCount()
-    {
+    public int getLastCapturedDmlCount() {
         return lastCapturedDmlCount.get();
     }
 
-    public void setLastCapturedDmlCount(int dmlCount)
-    {
+    public void setLastCapturedDmlCount(int dmlCount) {
         lastCapturedDmlCount.set(dmlCount);
         if (dmlCount > maxCapturedDmlCount.get()) {
             maxCapturedDmlCount.set(dmlCount);
@@ -349,20 +323,17 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public long getTotalProcessedRows()
-    {
+    public long getTotalProcessedRows() {
         return totalProcessedRows.get();
     }
 
     @Override
-    public long getTotalResultSetNextTimeInMilliseconds()
-    {
+    public long getTotalResultSetNextTimeInMilliseconds() {
         return totalResultSetNextTime.get().toMillis();
     }
 
     @Override
-    public long getAverageBatchProcessingThroughput()
-    {
+    public long getAverageBatchProcessingThroughput() {
         if (totalBatchProcessingDuration.get().isZero()) {
             return 0L;
         }
@@ -370,8 +341,7 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public long getLastBatchProcessingThroughput()
-    {
+    public long getLastBatchProcessingThroughput() {
         if (lastBatchProcessingDuration.get().isZero()) {
             return 0L;
         }
@@ -379,82 +349,69 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public long getFetchingQueryCount()
-    {
+    public long getFetchingQueryCount() {
         return logMinerQueryCount.get();
     }
 
     @Override
-    public int getBatchSize()
-    {
+    public int getBatchSize() {
         return batchSize.get();
     }
 
     @Override
-    public void setBatchSize(int size)
-    {
+    public void setBatchSize(int size) {
         if (size >= batchSizeMin && size <= batchSizeMax) {
             batchSize.set(size);
         }
     }
 
     @Override
-    public long getMillisecondToSleepBetweenMiningQuery()
-    {
+    public long getMillisecondToSleepBetweenMiningQuery() {
         return millisecondToSleepBetweenMiningQuery.get();
     }
 
     @Override
-    public void setMillisecondToSleepBetweenMiningQuery(long milliseconds)
-    {
+    public void setMillisecondToSleepBetweenMiningQuery(long milliseconds) {
         if (milliseconds >= sleepTimeMin && milliseconds < sleepTimeMax) {
             millisecondToSleepBetweenMiningQuery.set(milliseconds);
         }
     }
 
     @Override
-    public boolean getRecordMiningHistory()
-    {
+    public boolean getRecordMiningHistory() {
         return recordMiningHistory.get();
     }
 
     @Override
-    public int getHoursToKeepTransactionInBuffer()
-    {
+    public int getHoursToKeepTransactionInBuffer() {
         return hoursToKeepTransaction.get();
     }
 
     @Override
-    public long getMaxBatchProcessingThroughput()
-    {
+    public long getMaxBatchProcessingThroughput() {
         return maxBatchProcessingThroughput.get();
     }
 
     @Override
-    public long getNetworkConnectionProblemsCounter()
-    {
+    public long getNetworkConnectionProblemsCounter() {
         return networkConnectionProblemsCounter.get();
     }
 
     @Override
-    public long getTotalParseTimeInMilliseconds()
-    {
+    public long getTotalParseTimeInMilliseconds() {
         return totalParseTime.get().toMillis();
     }
 
-    public void addCurrentParseTime(Duration currentParseTime)
-    {
+    public void addCurrentParseTime(Duration currentParseTime) {
         totalParseTime.accumulateAndGet(currentParseTime, Duration::plus);
     }
 
     @Override
-    public long getTotalMiningSessionStartTimeInMilliseconds()
-    {
+    public long getTotalMiningSessionStartTimeInMilliseconds() {
         return totalStartLogMiningSessionDuration.get().toMillis();
     }
 
-    public void addCurrentMiningSessionStart(Duration currentStartLogMiningSession)
-    {
+    public void addCurrentMiningSessionStart(Duration currentStartLogMiningSession) {
         lastStartLogMiningSessionDuration.set(currentStartLogMiningSession);
         if (currentStartLogMiningSession.compareTo(maxStartingLogMiningSessionDuration.get()) > 0) {
             maxStartingLogMiningSessionDuration.set(currentStartLogMiningSession);
@@ -463,53 +420,44 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public long getLastMiningSessionStartTimeInMilliseconds()
-    {
+    public long getLastMiningSessionStartTimeInMilliseconds() {
         return lastStartLogMiningSessionDuration.get().toMillis();
     }
 
     @Override
-    public long getMaxMiningSessionStartTimeInMilliseconds()
-    {
+    public long getMaxMiningSessionStartTimeInMilliseconds() {
         return maxStartingLogMiningSessionDuration.get().toMillis();
     }
 
     @Override
-    public long getTotalProcessingTimeInMilliseconds()
-    {
+    public long getTotalProcessingTimeInMilliseconds() {
         return totalProcessingTime.get().toMillis();
     }
 
     @Override
-    public long getMinBatchProcessingTimeInMilliseconds()
-    {
+    public long getMinBatchProcessingTimeInMilliseconds() {
         return minBatchProcessingTime.get().toMillis();
     }
 
     @Override
-    public long getMaxBatchProcessingTimeInMilliseconds()
-    {
+    public long getMaxBatchProcessingTimeInMilliseconds() {
         return maxBatchProcessingTime.get().toMillis();
     }
 
-    public void setCurrentBatchProcessingTime(Duration currentBatchProcessingTime)
-    {
+    public void setCurrentBatchProcessingTime(Duration currentBatchProcessingTime) {
         totalProcessingTime.accumulateAndGet(currentBatchProcessingTime, Duration::plus);
     }
 
-    public void addCurrentResultSetNext(Duration currentNextTime)
-    {
+    public void addCurrentResultSetNext(Duration currentNextTime) {
         totalResultSetNextTime.accumulateAndGet(currentNextTime, Duration::plus);
     }
 
-    public void addProcessedRows(Long rows)
-    {
+    public void addProcessedRows(Long rows) {
         totalProcessedRows.getAndAdd(rows);
     }
 
     @Override
-    public void changeSleepingTime(boolean increment)
-    {
+    public void changeSleepingTime(boolean increment) {
         long sleepTime = millisecondToSleepBetweenMiningQuery.get();
         if (increment && sleepTime < sleepTimeMax) {
             sleepTime = millisecondToSleepBetweenMiningQuery.addAndGet(sleepTimeIncrement);
@@ -521,8 +469,7 @@ public class DamengStreamingChangeEventSourceMetrics
         LOGGER.debug("Updating sleep time window. Sleep time {}. Min sleep time {}. Max sleep time {}.", sleepTime, sleepTimeMin, sleepTimeMax);
     }
 
-    public void changeBatchSize(boolean increment)
-    {
+    public void changeBatchSize(boolean increment) {
         int currentBatchSize = batchSize.get();
         if (increment && currentBatchSize < batchSizeMax) {
             currentBatchSize = batchSize.addAndGet(batchSizeMin);
@@ -542,203 +489,168 @@ public class DamengStreamingChangeEventSourceMetrics
     // transactional buffer metrics
 
     @Override
-    public long getNumberOfActiveTransactions()
-    {
+    public long getNumberOfActiveTransactions() {
         return activeTransactions.get();
     }
 
     @Override
-    public long getNumberOfRolledBackTransactions()
-    {
+    public long getNumberOfRolledBackTransactions() {
         return rolledBackTransactions.get();
     }
 
     @Override
-    public Map<String, String> getSourceEventPosition()
-    {
+    public Map<String, String> getSourceEventPosition() {
         return Maps.newHashMap();
     }
 
     @Override
-    public long getMilliSecondsBehindSource()
-    {
+    public long getMilliSecondsBehindSource() {
         return 0;
     }
 
     @Override
-    public long getNumberOfCommittedTransactions()
-    {
+    public long getNumberOfCommittedTransactions() {
         return committedTransactions.get();
     }
 
     @Override
-    public String getLastTransactionId()
-    {
+    public String getLastTransactionId() {
         return "";
     }
 
     @Override
-    public long getCommitThroughput()
-    {
+    public long getCommitThroughput() {
         long timeSpent = Duration.between(startTime, clock.instant()).toMillis();
         return committedTransactions.get() * MILLIS_PER_SECOND / (timeSpent != 0 ? timeSpent : 1);
     }
 
     @Override
-    public long getRegisteredDmlCount()
-    {
+    public long getRegisteredDmlCount() {
         return registeredDmlCount.get();
     }
 
     @Override
-    public String getOldestScn()
-    {
+    public String getOldestScn() {
         return oldestScn.get().toString();
     }
 
-    public void setOldestScn(Scn scn)
-    {
+    public void setOldestScn(Scn scn) {
         oldestScn.set(scn);
     }
 
     @Override
-    public String getCommittedScn()
-    {
+    public String getCommittedScn() {
         return committedScn.get().toString();
     }
 
-    public void setCommittedScn(Scn scn)
-    {
+    public void setCommittedScn(Scn scn) {
         committedScn.set(scn);
     }
 
     @Override
-    public String getOffsetScn()
-    {
+    public String getOffsetScn() {
         return offsetScn.get().toString();
     }
 
-    public void setOffsetScn(Scn scn)
-    {
+    public void setOffsetScn(Scn scn) {
         offsetScn.set(scn);
     }
 
     @Override
-    public long getLagFromSourceInMilliseconds()
-    {
+    public long getLagFromSourceInMilliseconds() {
         return lagFromTheSourceDuration.get().toMillis();
     }
 
     @Override
-    public long getMaxLagFromSourceInMilliseconds()
-    {
+    public long getMaxLagFromSourceInMilliseconds() {
         return maxLagFromTheSourceDuration.get().toMillis();
     }
 
     @Override
-    public long getMinLagFromSourceInMilliseconds()
-    {
+    public long getMinLagFromSourceInMilliseconds() {
         return minLagFromTheSourceDuration.get().toMillis();
     }
 
     @Override
-    public Set<String> getAbandonedTransactionIds()
-    {
+    public Set<String> getAbandonedTransactionIds() {
         return abandonedTransactionIds.get();
     }
 
     @Override
-    public Set<String> getRolledBackTransactionIds()
-    {
+    public Set<String> getRolledBackTransactionIds() {
         return rolledBackTransactionIds.get();
     }
 
     @Override
-    public long getLastCommitDurationInMilliseconds()
-    {
+    public long getLastCommitDurationInMilliseconds() {
         return lastCommitDuration.get().toMillis();
     }
 
     @Override
-    public long getMaxCommitDurationInMilliseconds()
-    {
+    public long getMaxCommitDurationInMilliseconds() {
         return maxCommitDuration.get().toMillis();
     }
 
     @Override
-    public int getErrorCount()
-    {
+    public int getErrorCount() {
         return errorCount.get();
     }
 
     @Override
-    public int getWarningCount()
-    {
+    public int getWarningCount() {
         return warningCount.get();
     }
 
     @Override
-    public int getScnFreezeCount()
-    {
+    public int getScnFreezeCount() {
         return scnFreezeCount.get();
     }
 
-    public void setActiveTransactions(long activeTransactionCount)
-    {
+    public void setActiveTransactions(long activeTransactionCount) {
         activeTransactions.set(activeTransactionCount);
     }
 
-    public void incrementRolledBackTransactions()
-    {
+    public void incrementRolledBackTransactions() {
         rolledBackTransactions.incrementAndGet();
     }
 
-    public void incrementCommittedTransactions()
-    {
+    public void incrementCommittedTransactions() {
         committedTransactions.incrementAndGet();
     }
 
-    public void incrementRegisteredDmlCount()
-    {
+    public void incrementRegisteredDmlCount() {
         registeredDmlCount.incrementAndGet();
     }
 
-    public void incrementCommittedDmlCount(long counter)
-    {
+    public void incrementCommittedDmlCount(long counter) {
         committedDmlCount.getAndAdd(counter);
     }
 
-    public void incrementErrorCount()
-    {
+    public void incrementErrorCount() {
         errorCount.incrementAndGet();
     }
 
-    public void incrementWarningCount()
-    {
+    public void incrementWarningCount() {
         warningCount.incrementAndGet();
     }
 
-    public void incrementScnFreezeCount()
-    {
+    public void incrementScnFreezeCount() {
         scnFreezeCount.incrementAndGet();
     }
 
-    public void addAbandonedTransactionId(String transactionId)
-    {
+    public void addAbandonedTransactionId(String transactionId) {
         if (transactionId != null) {
             abandonedTransactionIds.get().add(transactionId);
         }
     }
 
-    public void addRolledBackTransactionId(String transactionId)
-    {
+    public void addRolledBackTransactionId(String transactionId) {
         if (transactionId != null) {
             rolledBackTransactionIds.get().add(transactionId);
         }
     }
 
-    public void setLastCommitDuration(Duration lastDuration)
-    {
+    public void setLastCommitDuration(Duration lastDuration) {
         lastCommitDuration.set(lastDuration);
         if (lastDuration.toMillis() > maxCommitDuration.get().toMillis()) {
             maxCommitDuration.set(lastDuration);
@@ -752,8 +664,7 @@ public class DamengStreamingChangeEventSourceMetrics
      *
      * @param databaseSystemTime the system time (<code>SYSTIMESTAMP</code>) of the database
      */
-    public void calculateTimeDifference(OffsetDateTime databaseSystemTime)
-    {
+    public void calculateTimeDifference(OffsetDateTime databaseSystemTime) {
         int offsetSeconds = databaseSystemTime.getOffset().getTotalSeconds();
         this.offsetSeconds.set(offsetSeconds);
         LOGGER.trace("Timezone offset of database system time is {} seconds", offsetSeconds);
@@ -764,8 +675,7 @@ public class DamengStreamingChangeEventSourceMetrics
         LOGGER.trace("Current time {} ms, database difference {} ms", now.toEpochMilli(), timeDiffMillis);
     }
 
-    public void calculateLagMetrics(Instant changeTime)
-    {
+    public void calculateLagMetrics(Instant changeTime) {
         if (changeTime != null) {
             final Instant correctedChangeTime = changeTime.plusMillis(timeDifference.longValue()).minusSeconds(offsetSeconds.longValue());
             final Duration lag = Duration.between(correctedChangeTime, clock.instant()).abs();
@@ -781,8 +691,7 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "OracleStreamingChangeEventSourceMetrics{" +
                 "currentScn=" + currentScn +
                 ", oldestScn=" + oldestScn.get() +
@@ -844,131 +753,108 @@ public class DamengStreamingChangeEventSourceMetrics
     }
 
     @Override
-    public void register()
-    {
+    public void register() {
     }
 
     @Override
-    public void unregister()
-    {
+    public void unregister() {
     }
 
     @Override
-    public String getLastEvent()
-    {
+    public String getLastEvent() {
         return "";
     }
 
     @Override
-    public long getMilliSecondsSinceLastEvent()
-    {
+    public long getMilliSecondsSinceLastEvent() {
         return 0;
     }
 
     @Override
-    public long getTotalNumberOfEventsSeen()
-    {
+    public long getTotalNumberOfEventsSeen() {
         return 0;
     }
 
     @Override
-    public long getTotalNumberOfCreateEventsSeen()
-    {
+    public long getTotalNumberOfCreateEventsSeen() {
         return 0;
     }
 
     @Override
-    public long getTotalNumberOfUpdateEventsSeen()
-    {
+    public long getTotalNumberOfUpdateEventsSeen() {
         return 0;
     }
 
     @Override
-    public long getTotalNumberOfDeleteEventsSeen()
-    {
+    public long getTotalNumberOfDeleteEventsSeen() {
         return 0;
     }
 
     @Override
-    public long getNumberOfEventsFiltered()
-    {
+    public long getNumberOfEventsFiltered() {
         return 0;
     }
 
     @Override
-    public long getNumberOfErroneousEvents()
-    {
+    public long getNumberOfErroneousEvents() {
         return 0;
     }
 
     @Override
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return false;
     }
 
     @Override
-    public int getQueueTotalCapacity()
-    {
+    public int getQueueTotalCapacity() {
         return 0;
     }
 
     @Override
-    public int getQueueRemainingCapacity()
-    {
+    public int getQueueRemainingCapacity() {
         return 0;
     }
 
     @Override
-    public long getMaxQueueSizeInBytes()
-    {
+    public long getMaxQueueSizeInBytes() {
         return 0;
     }
 
     @Override
-    public long getCurrentQueueSizeInBytes()
-    {
+    public long getCurrentQueueSizeInBytes() {
         return 0;
     }
 
     @Override
-    public String[] getCapturedTables()
-    {
+    public String[] getCapturedTables() {
         return new String[0];
     }
 
     @Override
-    public void onEvent(Partition partition, DataCollectionId dataCollectionId, OffsetContext offsetContext, Object o, Struct struct, Envelope.Operation operation)
-    {
+    public void onEvent(Partition partition, DataCollectionId dataCollectionId, OffsetContext offsetContext, Object o, Struct struct, Envelope.Operation operation) {
     }
 
     @Override
-    public void onFilteredEvent(Partition partition, String s)
-    {
+    public void onFilteredEvent(Partition partition, String s) {
     }
 
     @Override
-    public void onFilteredEvent(Partition partition, String s, Envelope.Operation operation)
-    {
+    public void onFilteredEvent(Partition partition, String s, Envelope.Operation operation) {
     }
 
     @Override
-    public void onErroneousEvent(Partition partition, String s)
-    {
+    public void onErroneousEvent(Partition partition, String s) {
     }
 
     @Override
-    public void onErroneousEvent(Partition partition, String s, Envelope.Operation operation)
-    {
+    public void onErroneousEvent(Partition partition, String s, Envelope.Operation operation) {
     }
 
     @Override
-    public void onConnectorEvent(Partition partition, ConnectorEvent connectorEvent)
-    {
+    public void onConnectorEvent(Partition partition, ConnectorEvent connectorEvent) {
     }
 
     @Override
-    public void connected(boolean b)
-    {
+    public void connected(boolean b) {
     }
 }

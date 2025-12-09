@@ -8,8 +8,7 @@ package org.devlive.connector.dameng.logminer.valueholder;
 /**
  * This class is a placeholder of DDL data
  */
-public interface LogMinerDdlEntry
-{
+public interface LogMinerDdlEntry {
     /**
      * @return text of the DDL statement
      */

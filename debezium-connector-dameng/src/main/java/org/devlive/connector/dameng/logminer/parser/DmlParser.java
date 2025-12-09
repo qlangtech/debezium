@@ -13,8 +13,7 @@ import org.devlive.connector.dameng.logminer.valueholder.LogMinerDmlEntry;
  *
  * @author Chris Cranford
  */
-public interface DmlParser
-{
+public interface DmlParser {
     /**
      * Parse a DML SQL string from the LogMiner event stream.
      *
