@@ -111,6 +111,7 @@ public class ReplicationMessageColumnValueResolver {
 
             case "timestamp":
             case "timestamp without time zone":
+            case "datetime": // KingBase MySQL-compatible datetime type
                 return value.asInstant();
 
             case "time":

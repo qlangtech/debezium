@@ -207,6 +207,10 @@ public class TypeRegistry {
                 name = "float8";
                 break;
             }
+            case "datetime": {
+                name = "timestamp";
+                break;
+            }
         }
 
 
