@@ -39,6 +39,10 @@ public abstract class AbstractMessageDecoder implements MessageDecoder {
 
     @Override
     public boolean shouldMessageBeSkipped(ByteBuffer buffer, Lsn lastReceivedLsn, Lsn startLsn, WalPositionLocator walPosition) {
+        // Record the LSN before the skip decision: this method runs for every raw message, including the ones the
+        // decoder will later drop (e.g. decoderbufs messages with an op it does not support). The replay phase
+        // re-delivers those messages, so they must be part of the location-phase LSN set.
+        walPosition.recordSeenLsn(lastReceivedLsn);
         // the lsn we started from is inclusive, so we need to avoid sending back the same message twice
         // but for the first record seen ever it is possible we received the same LSN as the one obtained from replication slot
         if (walPosition.skipMessage(lastReceivedLsn)) {

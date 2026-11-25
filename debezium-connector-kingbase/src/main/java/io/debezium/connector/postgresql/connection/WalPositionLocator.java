@@ -161,6 +161,36 @@ public class WalPositionLocator {
     }
 
     /**
+     * Records an LSN observed at the wire level during the location phase.
+     *
+     * <p>
+     * The {@code lsnSeen} set is normally populated from {@link #resumeFromLsn(Lsn, ReplicationMessage)}, i.e. only for
+     * messages that the decoder actually dispatches to the replication processor. Some decoders (notably decoderbufs,
+     * see {@code PgProtoMessageDecoder}) drop messages with an operation they do not model without invoking the
+     * processor, so their LSN would never be recorded. The replay phase however re-delivers such messages and asks
+     * {@link #skipMessage(Lsn)} about them, which would then fail with
+     * "not present among LSNs seen in the location phase".
+     *
+     * <p>
+     * Recording the LSN before the skip decision makes the two phases consistent, while the sanity check in
+     * {@link #skipMessage(Lsn)} still catches LSNs that were never delivered at all (e.g. the slot already moved past
+     * them).
+     *
+     * <p>
+     * The recording window closes as soon as the resume position has been located ({@code startStreamingLsn != null}).
+     * This is required because {@link #skipMessage(Lsn)} flips {@code passMessages} back to {@code true} once the
+     * replay reaches the resume position; without the {@code startStreamingLsn == null} condition the set — which is
+     * cleared at that very moment — would start growing again for the rest of the connector's lifetime.
+     *
+     * @param lsn the LSN reported by the replication driver for the raw message just received
+     */
+    public void recordSeenLsn(Lsn lsn) {
+        if (passMessages && searchingEnabled() && startStreamingLsn == null && lsn != null && lsn.isValid()) {
+            lsnSeen.add(lsn);
+        }
+    }
+
+    /**
      * @return true if searching of WAL position should be executed
      */
     public boolean searchingEnabled() {
